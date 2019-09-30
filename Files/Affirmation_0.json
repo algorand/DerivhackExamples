@@ -1,0 +1,56 @@
+{
+  "identifier" : [ {
+    "assignedIdentifier" : [ {
+      "identifier" : {
+        "value" : "affirmation_0"
+      },
+      "version" : 1
+    } ],
+    "meta" : {
+      "globalKey" : "b7cc989c"
+    }
+  } ],
+  "lineage" : {
+    "eventReference" : [ {
+      "globalReference" : "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE="
+    } ],
+    "executionReference" : [ {
+      "globalReference" : "vkFNMnTu1Fnk/p1gktgvz040El1XFnMwxYAVdILDlto="
+    } ]
+  },
+  "party" : [ {
+    "account" : {
+      "accountName" : {
+        "value" : "Client1_ACT#0"
+      },
+      "accountNumber" : {
+        "value" : "Client1_ACT#0_NQQVRTLFIT4HZ"
+      },
+      "meta" : {
+        "globalKey" : "b8e40e1c"
+      }
+    },
+    "meta" : {
+      "globalKey" : "84399821",
+      "externalKey" : "Client1_ID#0_NH90YY6QYVYHM"
+    },
+    "name" : {
+      "value" : "Client1"
+    },
+    "partyId" : [ {
+      "value" : "Client1_ID#0_NH90YY6QYVYHM"
+    } ]
+  } ],
+  "partyRole" : [ {
+    "partyReference" : {
+      "globalReference" : "GkATYHcJ0uWdD0klwf0/RCreumcOlWEKDvfHzLfNZiA="
+    },
+    "role" : "CLIENT"
+  }, {
+    "partyReference" : {
+      "globalReference" : "GkATYHcJ0uWdD0klwf0/RCreumcOlWEKDvfHzLfNZiA="
+    },
+    "role" : "BUYER"
+  } ],
+  "status" : "AFFIRMED"
+}

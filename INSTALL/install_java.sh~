@@ -1,0 +1,4 @@
+brew tap caskroom/cask
+brew cask info java  
+brew cask install java 
+echo 'export PATH=/usr/local/bin:$PATH' >>~/.bash_profile

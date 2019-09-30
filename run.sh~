@@ -1,0 +1,19 @@
+##Example Java scripts to use Algorand with the ISDA CDM
+
+
+#Take a file with allocation instructions and convert it into a CDM file
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.DerivhackDemo2" \
+ -Dexec.args="./Files/input_allocations.json ./Files/output_executions.json"  -l "./Files/output_allocations.json" -q  | grep -v WARNING
+
+
+#Compute the hash of a CDM JSON file and commit that hash to the blockchain
+ mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.HashTransaction"\
+ -Dexec.args="./Files/output_allocations.json" -e -l  "./Files/transaction_id.txt" -q | grep -v WARNING
+
+#Verify that the hash of a CDM JSON file
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.VerifyTransaction"\
+ -Dexec.args="./Files/output_allocations.json ./Files/transaction_id.txt" -e  -q | grep -v WARNING
+
+#Create Affirmations from Allocation
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.AffirmationStep"\
+ -Dexec.args="./Files/UC2_allocation_1.json" -l "./Files/Affirmation_1.json"  -e  -q | grep -v WARNIN

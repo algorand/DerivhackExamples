@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
+import org.json.JSONObject;
 
 public class ReadAndWrite{
 
@@ -26,6 +27,14 @@ public static void writeFile(String filePath,String content)
   throws IOException {
     BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
     writer.write(content);
+     
+    writer.close();
+}
+
+public static void writePrettyJSON(String filePath,String content) 
+  throws IOException {
+    BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+    writer.write(new JSONObject(content).toString(4));
      
     writer.close();
 }

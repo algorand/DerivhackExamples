@@ -1,0 +1,41 @@
+{
+    "algorandID": "HJNFC3UMBQ23F3BX56FCQQ5ND54RYVFUORT6CQYVA6HOTC2Z5M3JL2YXZY",
+    "userHash": "26567ac4535b3a3031c465e472c0226badafaa67784b98071b8b05bbf6aa0728",
+    "globalKey": "xIBwSYskqfYuo71OylXWHFH1u5lbAcAdAnM4LcNheBg=",
+    "algorandPassphrase": "cable glory humor fantasy process mystery degree digital lunch paddle tone video eight crisp oil invest insane drum clap doll rather topple rebel able knife",
+    "name": "Client1",
+    "party": {
+        "meta": {
+            "externalKey": "Client1_ID#2_CAOIBGBYU6QPR",
+            "globalKey": "xIBwSYskqfYuo71OylXWHFH1u5lbAcAdAnM4LcNheBg=",
+            "scheme": null
+        },
+        "person": null,
+        "name": {
+            "meta": null,
+            "value": "Client1"
+        },
+        "partyId": [{
+            "meta": null,
+            "value": "Client1_ID#2_CAOIBGBYU6QPR"
+        }],
+        "account": {
+            "servicingParty": null,
+            "accountName": {
+                "meta": null,
+                "value": "Client1_ACT#2"
+            },
+            "meta": {
+                "externalKey": null,
+                "globalKey": "cHT7pO5Q+p3hO3sxjl+ACvyGkYYWIBaA2PpVaRO/dvs=",
+                "scheme": null
+            },
+            "accountType": null,
+            "accountNumber": {
+                "meta": null,
+                "value": "Client1_ACT#2_BJKXFTGW4BFPY"
+            },
+            "accountBeneficiary": null
+        }
+    }
+}

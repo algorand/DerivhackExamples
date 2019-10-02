@@ -3,16 +3,21 @@ package com.algorand.utils;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 
-import org.jongo.Jongo;
-import com.mongodb.DB;
-import com.mongodb.BasicDBObject;
-import org.jongo.MongoCollection;
+
+import java.util.Arrays;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 import java.io.*;
 import java.util.*;
+import java.nio.*;
+import java.nio.file.*;
 
-import org.isda.cdm.Party;
+
 import org.isda.cdm.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
@@ -20,43 +25,19 @@ import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
 import com.algorand.algosdk.algod.client.model.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.google.common.collect.*;
+
+
 public class User{
-	String globalKey;
-	String algorandID;
-	String algorandPassphrase;
-	String name;
-	Party party;
+	public String globalKey;
+	public String algorandID;
+	public String algorandPassphrase;
+	public String name;
+	public Party party;
+	public String userHash;
 
-
-
-	public static User getOrCreateUser(Party party,DB mongoDB){
-		String partyKey = party.getMeta().getGlobalKey();
-		Jongo jongo = new Jongo(mongoDB);
-		MongoCollection users = jongo.getCollection("users");
-
-		User foundUser = users.findOne("{party.meta.globalKey: '" + partyKey + "'}").as(User.class);
-		if (foundUser == null){
-			return new User(party,mongoDB);
-		}
-		else{
-			return foundUser;
-		}
-	}
-
-	public User(Party party, String globalKey, String algorandID, String algorandPassphrase, String name){
-		this.party = party;
-		this.globalKey = globalKey;
-		this.algorandID = algorandID;
-		this.algorandPassphrase = algorandPassphrase;
-		this.name = name;
-
-	}
-
-
-	public  User(Party party,DB mongoDB){
-		try{
-				Jongo jongo = new Jongo(mongoDB);
-				MongoCollection users = jongo.getCollection("users");
+	public User( Party party ) throws Exception{
+				ObjectMapper mapper = new ObjectMapper();
 
 				ArrayList<String> algorandInfo = createAlgorandAccount();
 				this.algorandID = algorandInfo.get(0);
@@ -64,33 +45,62 @@ public class User{
 				this.party = party;
 				this.globalKey = party.getMeta().getGlobalKey();
 				this.name = party.getName().getValue();
+				this.userHash = DigestUtils.sha256Hex(mapper.writeValueAsString(party));
+	}
 
-				//TODO: Right now the password is the party's global key
-				//      Set this way to make derivhack prototyping easier
-				createMongoAccount(mongoDB,globalKey,globalKey);
-				users.save(this);
+	public static User getOrCreateUser(Party party) throws Exception{
+		ObjectMapper mapper = new ObjectMapper();
+		String partyHash = DigestUtils.sha256Hex(mapper.writeValueAsString(party));
+	
 
-			}
-			catch(Exception e){
-				e.printStackTrace();
-				this.algorandID = null;
-				this.algorandPassphrase = null;
-				this.party = null;
-				this.globalKey = null;
-				this.name = null;
-			}
+		File[] usersArray = new File("./Users/").listFiles(File::isDirectory);
+		List<File> userList = new ArrayList<File>(Arrays.asList(usersArray));
+		File userFile;
 
+		try{
+		 userFile = userList.stream()
+							.filter(x -> x.getName().equals(partyHash + ".json"))
+							.collect(MoreCollectors.onlyElement());
+		
+		 String userFileContent = ReadAndWrite.readFile("./Users/" + partyHash + ".json");
+		 User readUser = mapper.readValue(userFileContent, User.class);
+		 return readUser;
 		}
+		catch(NoSuchElementException e){
+				User user =  new User(party); 
+
+				String json = mapper.writeValueAsString(user);
+				ReadAndWrite.writePrettyJSON("./Users/"+partyHash+".json",json);
+				Files.createDirectories(Paths.get("./UserDirectories/"+partyHash+"/Events/"));
+				Files.createDirectories(Paths.get("./UserDirectories/"+partyHash+"/Affirmations/"));
+
+				return user;
+		}
+		catch(IllegalArgumentException e){
+				System.out.println("More than one user by that key");
+				e.printStackTrace();
+				return null;
+			}
+			
+
+	}
+
+
+
+	
 		
 
 
 	public void commitEvent(Event event) throws Exception{
 		String eventKey = event.getMeta().getGlobalKey();
-		String message = eventKey;
+		ObjectMapper mapper = new ObjectMapper();
+
+		String filename = DigestUtils.sha256Hex(mapper.writeValueAsString(event));
+
 		 //Create an Algorand Transaction
         Transaction transaction = null;
         try {
-        	transaction = NotesTransaction.commitNotes(message);
+        	transaction = NotesTransaction.commitNotes("{File Name: " + filename + "," + "Lineage: " + mapper.writeValueAsString(event.getLineage())+"}");
         }
         catch(Exception e){
         	e.printStackTrace();
@@ -101,10 +111,8 @@ public class User{
         if(transaction != null){
         	String txID = transaction.getTx();
         	EventTransaction eventTransaction = new EventTransaction(event,txID);
-        	DB eventDB = MongoUtils.getDatabase(this.party.getName().getValue());
-        	Jongo jongo = new Jongo(eventDB);
-        	MongoCollection eventCollection = jongo.getCollection("Events");
-        	eventCollection.save(eventTransaction);
+        	String json = mapper.writeValueAsString(eventTransaction);
+        	ReadAndWrite.writePrettyJSON("./UserDirectories/"+this.userHash+"/Events/"+filename+".json",json);
         }
 
 
@@ -113,11 +121,12 @@ public class User{
 		public void commitAffirmation(Affirmation affirmation) throws Exception{
 			ObjectMapper mapper = new ObjectMapper();
 
-			String message = DigestUtils.sha256Hex(mapper.writeValueAsString(affirmation));
+			String filename = DigestUtils.sha256Hex(mapper.writeValueAsString(affirmation));
 			 //Create an Algorand Transaction
 	        Transaction transaction = null;
 	        try {
-	        	transaction = NotesTransaction.commitNotes(message);
+        		transaction = NotesTransaction.commitNotes("{File Name: " + filename + "," + "Lineage: " + mapper.writeValueAsString(affirmation.getLineage()) + "}");
+
 	        }
 	        catch(Exception e){
 	        	e.printStackTrace();
@@ -128,16 +137,15 @@ public class User{
 	        if(transaction != null){
 	        	String txID = transaction.getTx();
 	        	AffirmationTransaction affirmationTransaction = new AffirmationTransaction(affirmation,txID);
-	        	DB eventDB = MongoUtils.getDatabase(this.party.getName().getValue());
-	        	Jongo jongo = new Jongo(eventDB);
-	        	MongoCollection affirmationCollection = jongo.getCollection("Affirmations");
-	        	affirmationCollection.save(affirmationTransaction);
+	        	String json = mapper.writeValueAsString(affirmationTransaction);
+				ReadAndWrite.writePrettyJSON("./UserDirectories/"+this.userHash+"/Affirmations/"+filename+".json",json);
+        
 	        }
 
 
 	}
 
-	public ArrayList<String> createAlgorandAccount() throws Exception{
+	public static ArrayList<String> createAlgorandAccount() throws Exception{
             Account act = new Account();
             
             //Get the new account address
@@ -152,7 +160,7 @@ public class User{
 
 	}
 
-	public static void createMongoAccount(DB db, String username, String password){
+	/*public static void createMongoAccount(MongoDatabase db, String username, String password){
 		  Map<String, Object> commandArguments = new HashMap<>();
 		  commandArguments.put("createUser", username);
 		  commandArguments.put("pwd", password);
@@ -160,19 +168,17 @@ public class User{
 		  commandArguments.put("roles", roles);
 		  BasicDBObject command = new BasicDBObject(commandArguments);
 		  db.command(command);
-		  db.getCollection(username);
+		  
+	}*/
 
-	}
+	public static void main(String [] args) throws Exception{
 
-	public static void main(String [] args) throws IOException{
-
-		DB mongoDB = MongoUtils.getDatabase("users");
 
 		String partyObject = ReadAndWrite.readFile("./Files/PartyTest.json");
 		System.out.println(partyObject);
 		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
 		Party party = rosettaObjectMapper.readValue(partyObject, Party.class);
-		User user = getOrCreateUser(party,mongoDB);
+		User user = getOrCreateUser(party);
 	}
 
 

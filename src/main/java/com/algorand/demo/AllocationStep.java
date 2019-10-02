@@ -2,8 +2,6 @@
 package com.algorand.demo;
 import com.algorand.utils.*;
 import com.algorand.algosdk.algod.client.model.Transaction;
-import org.jongo.Jongo;
-import com.mongodb.DB;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -212,10 +210,9 @@ public  class AllocationStep {
         List<Party> parties = allocationEvent.getParty();
         
         User user;
-        DB mongoDB = MongoUtils.getDatabase("users");
 
         for (Party party: parties){
-             user = User.getOrCreateUser(party,mongoDB);
+             user = User.getOrCreateUser(party);
         }
 
         String json = rosettaObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(allocationEvent);

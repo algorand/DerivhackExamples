@@ -1,0 +1,41 @@
+{
+    "algorandID": "XUQLN5YVOKDZGPBTZX2W4DSYBVJUER65HPCNOXC3ZZVNAWYZJOLURILCR4",
+    "userHash": "70cce2048b64505df5a2c887bd00e27bd7f071531603911277dccc288c5b89f0",
+    "globalKey": "NKbmTRySI+MwEy+qqV0+romOrBu0GsWdqogMXGtzSVM=",
+    "algorandPassphrase": "soccer life victory empower room inform custom hand library cram basic gap mail usual canvas sense cannon satoshi anxiety label rifle clap mad abstract program",
+    "name": "Broker2",
+    "party": {
+        "meta": {
+            "externalKey": "Broker2_ID#0_AN93QUDTMRPAB",
+            "globalKey": "NKbmTRySI+MwEy+qqV0+romOrBu0GsWdqogMXGtzSVM=",
+            "scheme": null
+        },
+        "person": null,
+        "name": {
+            "meta": null,
+            "value": "Broker2"
+        },
+        "partyId": [{
+            "meta": null,
+            "value": "Broker2_ID#0_AN93QUDTMRPAB"
+        }],
+        "account": {
+            "servicingParty": null,
+            "accountName": {
+                "meta": null,
+                "value": "Broker2_ACT#0"
+            },
+            "meta": {
+                "externalKey": null,
+                "globalKey": "GyBU5vHoyL4BM7ctxcCsNp3VXMlELtkERhGao8KbExY=",
+                "scheme": null
+            },
+            "accountType": null,
+            "accountNumber": {
+                "meta": null,
+                "value": "Broker2_ACT#0_TTJE0NQUTRIFB"
+            },
+            "accountBeneficiary": null
+        }
+    }
+}

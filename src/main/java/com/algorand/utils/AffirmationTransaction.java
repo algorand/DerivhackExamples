@@ -11,10 +11,10 @@ import org.isda.cdm.*;
 
 
 public class AffirmationTransaction{
-	String algorandTransactionID;
-	String algoExplorerLink;
-	Affirmation affirmation;
-	Lineage lineage;
+	public String algorandTransactionID;
+	public String algoExplorerLink;
+	public Affirmation affirmation;
+	public Lineage lineage;
 
 	public AffirmationTransaction(Affirmation affirmation,String algorandTransactionID){
 		this.affirmation = affirmation;

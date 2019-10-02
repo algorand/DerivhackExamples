@@ -1,0 +1,41 @@
+{
+    "algorandID": "J6LDSTVJ7KVP2NJ2GY75WRSPNANY3TUMPANISZ6LLZWBSKU2UF3CZQJLMI",
+    "userHash": "38926dd999c22accbaca3c4d803fb3c58603e62db85690147b7bc82cf72beea5",
+    "globalKey": "5746c270",
+    "algorandPassphrase": "shaft admit gate exhibit route main such public turn immense neglect odor rebel connect kid curve crane episode bunker ecology cinnamon race chair abandon mix",
+    "name": "Client1",
+    "party": {
+        "meta": {
+            "externalKey": "Client1_ID#1_LBLBMTTQKNFTP",
+            "globalKey": "5746c270",
+            "scheme": null
+        },
+        "person": null,
+        "name": {
+            "meta": null,
+            "value": "Client1"
+        },
+        "partyId": [{
+            "meta": null,
+            "value": "Client1_ID#1_LBLBMTTQKNFTP"
+        }],
+        "account": {
+            "servicingParty": null,
+            "accountName": {
+                "meta": null,
+                "value": "Client1_ACT#1"
+            },
+            "meta": {
+                "externalKey": null,
+                "globalKey": "d9392c28",
+                "scheme": null
+            },
+            "accountType": null,
+            "accountNumber": {
+                "meta": null,
+                "value": "Client1_ACT#1_BGMNIH56Y4Z5E"
+            },
+            "accountBeneficiary": null
+        }
+    }
+}

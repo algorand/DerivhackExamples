@@ -1,0 +1,119 @@
+{
+    "lineage": {
+        "executionReference": [{
+            "externalReference": null,
+            "globalReference": "VjMmTrCQs04HJSN40I2W7GidSXjSncjbwfuuakKzwVE=",
+            "value": null
+        }],
+        "equityPayoutReference": null,
+        "creditDefaultPayoutReference": null,
+        "eventReference": [{
+            "externalReference": null,
+            "globalReference": "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE=",
+            "value": null
+        }],
+        "interestRatePayoutReference": null,
+        "portfolioStateReference": null,
+        "optionPayoutReference": null,
+        "legalAgreement": null,
+        "cashflowReference": null,
+        "contractReference": null,
+        "transferReference": null
+    },
+    "algorandTransactionID": "GXB5SIE4RVRV4X4VE7AQ7O4EPCHSOFTPHKNJ77U7PKBWNUUN253A",
+    "algoExplorerLink": "https://testnet.algoexplorer.io/tx/GXB5SIE4RVRV4X4VE7AQ7O4EPCHSOFTPHKNJ77U7PKBWNUUN253A",
+    "affirmation": {
+        "lineage": {
+            "executionReference": [{
+                "externalReference": null,
+                "globalReference": "VjMmTrCQs04HJSN40I2W7GidSXjSncjbwfuuakKzwVE=",
+                "value": null
+            }],
+            "equityPayoutReference": null,
+            "creditDefaultPayoutReference": null,
+            "eventReference": [{
+                "externalReference": null,
+                "globalReference": "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE=",
+                "value": null
+            }],
+            "interestRatePayoutReference": null,
+            "portfolioStateReference": null,
+            "optionPayoutReference": null,
+            "legalAgreement": null,
+            "cashflowReference": null,
+            "contractReference": null,
+            "transferReference": null
+        },
+        "identifier": [{
+            "meta": {
+                "externalKey": null,
+                "globalKey": "b7cc98bb",
+                "scheme": null
+            },
+            "issuerReference": null,
+            "assignedIdentifier": [{
+                "identifier": {
+                    "meta": null,
+                    "value": "affirmation_1"
+                },
+                "version": 1
+            }],
+            "issuer": null
+        }],
+        "partyRole": [
+            {
+                "role": "CLIENT",
+                "ownershipPartyReference": null,
+                "partyReference": {
+                    "externalReference": null,
+                    "globalReference": "3/OmcxBxF1hmK3kYJIRoLBnjrj8QPo1MO8FPDpqkBfc=",
+                    "value": null
+                }
+            },
+            {
+                "role": "BUYER",
+                "ownershipPartyReference": null,
+                "partyReference": {
+                    "externalReference": null,
+                    "globalReference": "3/OmcxBxF1hmK3kYJIRoLBnjrj8QPo1MO8FPDpqkBfc=",
+                    "value": null
+                }
+            }
+        ],
+        "party": [{
+            "meta": {
+                "externalKey": "Client1_ID#1_LBLBMTTQKNFTP",
+                "globalKey": "5746c270",
+                "scheme": null
+            },
+            "person": null,
+            "name": {
+                "meta": null,
+                "value": "Client1"
+            },
+            "partyId": [{
+                "meta": null,
+                "value": "Client1_ID#1_LBLBMTTQKNFTP"
+            }],
+            "account": {
+                "servicingParty": null,
+                "accountName": {
+                    "meta": null,
+                    "value": "Client1_ACT#1"
+                },
+                "meta": {
+                    "externalKey": null,
+                    "globalKey": "d9392c28",
+                    "scheme": null
+                },
+                "accountType": null,
+                "accountNumber": {
+                    "meta": null,
+                    "value": "Client1_ACT#1_BGMNIH56Y4Z5E"
+                },
+                "accountBeneficiary": null
+            }
+        }],
+        "status": "AFFIRMED"
+    }
+}

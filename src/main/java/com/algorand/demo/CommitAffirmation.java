@@ -3,8 +3,6 @@ package com.algorand.demo;
 import com.algorand.utils.*;
 import com.algorand.algosdk.algod.client.model.Transaction;
 
-import org.jongo.Jongo;
-import com.mongodb.DB;
 
 import com.algorand.algosdk.algod.client.model.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +24,9 @@ public  class CommitAffirmation {
         //Add any new parties to the database, and commit the event to their own private databases
         List<Party> parties = affirmation.getParty();
         User user;
-        DB mongoDB = MongoUtils.getDatabase("users");
 
         for (Party party: parties){
-             user = User.getOrCreateUser(party,mongoDB);
+             user = User.getOrCreateUser(party);
              user.commitAffirmation(affirmation);
         } 
 

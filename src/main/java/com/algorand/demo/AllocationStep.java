@@ -195,7 +195,7 @@ public  class AllocationStep {
         Event executionEvent = rosettaObjectMapper
                 .readValue(executionsCDM, Event.class);
         
-       
+       // Get the execution associated with the "Execution Event"
         Execution execution = executionEvent
                                 .getPrimitive()
                                 .getExecution()
@@ -203,21 +203,26 @@ public  class AllocationStep {
                                 .getAfter()  
                                 .getExecution(); 
 
-        AllocationInstructions allocationInstructions = buildAllocationInstructions(allocationInstructionsDH);
+        //Call a helper method to build the allocation instructions
+        AllocationInstructions allocationInstructions 
+            = buildAllocationInstructions(allocationInstructionsDH);
+
+        //Use Guice to instantiate the allocation function at runtime
         Injector injector = Guice.createInjector(new AlgorandRuntimeModule());
         Allocate allocationFunction = injector.getInstance(Allocate.class);
-        Event allocationEvent = allocationFunction.evaluate(execution,allocationInstructions);
-        List<Party> parties = allocationEvent.getParty();
-        
-        User user;
 
+        // Use the CDM's Allocate function to create an allocation event
+        Event allocationEvent = allocationFunction.evaluate(execution,allocationInstructions);
+
+        // Get all the parties for the event, and have them commit the event
+        // to their own datastores, and to the blockchain
+        List<Party> parties = allocationEvent.getParty();
+        User user;
         for (Party party: parties){
              user = User.getOrCreateUser(party);
+             user.commitEvent(allocationEvent);
         }
 
-        String json = rosettaObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(allocationEvent);
-
-        System.out.println(json);
     }
 }
 

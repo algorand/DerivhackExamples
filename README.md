@@ -11,9 +11,17 @@ The goal of the ISDA Common Domain Model (CDM)  is to allow financial institutio
 4. **Ease of Use**: Because the Algorand blockchain is a permissionless blockchain, institutions can interact with it using the software of their choice, and without the need to set up their own distributed system. Algorand provides easy to use APIs that read to and write from the blockchain, and SDKs in [Python](https://developer.algorand.org/docs/python-sdk), [Go](https://developer.algorand.org/docs/go-sdk), [Java](https://developer.algorand.org/docs/java-sdk) and [Javascript](https://developer.algorand.org/docs/javascript-sdk). 
 
 
-## Installing, Compiling and Running the Code
+## The Algorand Blockchain
 
-### Dependencies
+The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. Algorand provides extensive [documentation](https://developer.algorand.org/docs/getting-started), and provides SDKs in four languages (Go, Python, Java and Javascript) to interact with the blockchain. 
+
+![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/isdasample/blob/master/blob/image_1.png)
+*Figure 1: Nodes running the Algorand client software around the world*
+
+
+# Installing, Compiling and Running the Code
+
+## Dependencies
 
 Running the code in this repository requires that you have
 
@@ -21,30 +29,63 @@ Running the code in this repository requires that you have
 2. Java
 3. Maven
 
-### Java and Maven Installation
+## Java and Maven Installation
 There are bash scripts (written for OS X) which install Java and Maven and set the correct paths to use them. These scripts are in the `INSTALL` folder and should be run in the following order
 
 1. `install_brew.sh` if the user does not have Hombrew installed (OS X utility to install programs)
 2. `install_java.sh` if the user does not have Java installed. This installs the OpenJDK 
 3. `install_maven.sh` if the user does not have Maven installed
 
-### Java library Installation
+## Java library Installation
 
 The main directory contains a pom.xml file which Maven uses to download Java libraries that the code depends on, including the Algorand Java SDK, and the Java implementation of the ISDA CDM.
 
 The code has been tested on a computer running OS X  Version 10.14.5, OpenJDK 13, and Maven version 3.6.1.
 
-###  Compilation
+##  Compilation
 A `settings.xml` file is provided in the project root directory, use it install dependencies as below: 
 ```bash
 mvn -s settings.xml clean install
 
 ```
-### Running the Code
-To run the example code and store the output in a file called ```output.txt```, run
+
+You can also run 
 ```bash
-sh run.sh > output.txt
+sh compile.sh
 ```
+from the root directory.
+
+## Running the Code
+To run the example code, type 
+```bash
+sh run.sh 
+```
+in the root directory.
+
+# Example Use Cases
+## Execution
+In the Derivhack Hackathon, users  are given a [trade execution file](https://github.com/algorand/isdasample/Files/UC1_block_execute_BT1.json) and need to 
+
+1. Load the JSON file into their system
+2. Create users in their distributed ledger corresponding to the parties in the execution
+3. Create a report of the execution
+
+In this example, we use the Algorand blockchain to ensure different parties have consistent versions of the file, while keeping their datastores private.  The information stored in the chain includes the global key of the execution, its lineage, and the file path where the user stored the Execution JSON object in their private data store. 
+
+Figure 2 shows the code from the main function in the class ```CommitEvent.java```, which reads a CDM Event, creates Algorand accounts for all parties in the event, and then commits the global key and lineage of the event to the blockchain. 
+
+![Figure 2: Committing an Execution Event](https://github.com/algorand/isdasample/blob/master/blob/commit_event.png)
+
+The corresponding shell command to execute this function is 
+```bash
+##Commit the execution file to the blockchain
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
+ -Dexec.args="./Files/UC1_block_execute_BT1.json" -e -q
+```
+
+
+
+
 
 
 # Algorand’s Framework for Processing CDM events
@@ -60,10 +101,6 @@ Example 1 shows a snippet of code that creates an Allocation Primitive using the
 
 ## Committing Hashed Event to the Algorand Blockchain
 
-The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. Algorand provides extensive [documentation](https://developer.algorand.org/docs/getting-started), and provides SDKs in four languages (Go, Python, Java and Javascript) to interact with the blockchain. 
-
-![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/isdasample/blob/master/blob/image_1.png)
-*Figure 1: Nodes running the Algorand client software around the world*
 
 Once users have serialized a CDM Object to JSON, they can use a hash function (including Regnosys’ provided hash function that generates canonical keys of CDM objects) to obtain a compact digital fingerprint of the CDM object. This digital fingerprint can then be uploaded to the Algorand blockchain using any of Algorand’s SDKs. Example 2 below shows a program that reads a JSON representation of a CDM Allocation Primitive, deserializes it to Java, computes the Rosetta Key of the Allocation Primitive, and commits this key to the blockchain. 
 

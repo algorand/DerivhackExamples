@@ -15,7 +15,7 @@ The goal of the ISDA Common Domain Model (CDM)  is to allow financial institutio
 
 The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. Algorand provides extensive [documentation](https://developer.algorand.org/docs/getting-started), and provides SDKs in four languages (Go, Python, Java and Javascript) to interact with the blockchain. 
 
-![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/isdasample/blob/master/blob/image_1.png)
+![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/DerivhackExamples/blob/master/blob/image_1.png)
 *Figure 1: Nodes running the Algorand client software around the world*
 
 
@@ -64,7 +64,7 @@ in the root directory.
 
 # Example Use Cases
 ## Execution
-In the Derivhack Hackathon, users  are given a [trade execution file](https://github.com/algorand/isdasample/Files/UC1_block_execute_BT1.json) and need to 
+In the Derivhack Hackathon, users  are given a [trade execution file](https://github.com/algorand/DerivhackExamples/Files/UC1_block_execute_BT1.json) and need to 
 
 1. Load the JSON file into their system
 2. Create users in their distributed ledger corresponding to the parties in the execution
@@ -74,7 +74,7 @@ In this example, we use the Algorand blockchain to ensure different parties have
 
 Figure 2 shows the code from the main function in the class ```CommitEvent.java```, which reads a CDM Event, creates Algorand accounts for all parties in the event, and then commits the global key and lineage of the event to the blockchain. 
 
-![Figure 2: Committing an Execution Event](https://github.com/algorand/isdasample/blob/master/blob/commit_event.png)
+![Figure 2: Committing an Execution Event](https://github.com/algorand/DerivhackExamples/blob/master/blob/commit_event.png)
 
 The corresponding shell command to execute this function is 
 ```bash

@@ -18,10 +18,17 @@ import com.google.inject.Injector;
 import org.isda.cdm.*;
 
 public  class CommitEvent {
+// A class to commit CDM Events to the Algorand Blockchain
 
  
 
     public static void main(String [] args) throws Exception{
+        // This function 
+        // 1. Reads a CDM Event from a JSON file
+        // 2. Creates Algorand accounts for all parties in the event
+        // 3. Commits information about the event to the Algorand blockchain
+        // and to the participant's private datastores
+
         ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
         //Read the input arguments and read them into files
         String fileName = args[0];

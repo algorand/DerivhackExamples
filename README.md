@@ -10,14 +10,16 @@ The goal of the ISDA Common Domain Model (CDM)  is to allow financial institutio
 
 4. **Ease of Use**: Because the Algorand blockchain is a permissionless blockchain, institutions can interact with it using the software of their choice, and without the need to set up their own distributed system. Algorand provides easy to use APIs that read to and write from the blockchain, and SDKs in [Python](https://developer.algorand.org/docs/python-sdk), [Go](https://developer.algorand.org/docs/go-sdk), [Java](https://developer.algorand.org/docs/java-sdk) and [Javascript](https://developer.algorand.org/docs/javascript-sdk). 
 
-<!--
+
 ## The Algorand Blockchain
 
-The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. Algorand provides extensive [documentation](https://developer.algorand.org/docs/getting-started), and provides SDKs in four languages (Go, Python, Java and Javascript) to interact with the blockchain. 
+The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. The Algorand blockchain can process 1000 transactions per second with a latency of less than 5 secods.
 
-![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/DerivhackExamples/blob/master/blob/image_1.png)
+In addition, Algorand provides extensive [documentation](https://developer.algorand.org/docs/getting-started), and provides SDKs in four languages (Go, Python, Java and Javascript) to interact with the blockchain. 
+
+![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/DerivhackExamples/blob/master/blob/nodes_map.png)
 *Figure 1: Nodes running the Algorand client software around the world*
--->
+
 
 # Installing, Compiling and Running the Code
 

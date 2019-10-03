@@ -183,7 +183,7 @@ mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.AffirmationSte
 # Verifying Outputs
 Each party in a CDM object stores their own copy of the object, together with its lineage, global key (if available), and a link to the event in the Algorand Blockchain. The blockchain ensures coherency: all users have the same CDM event, and there are no incoherencies between their representations This is almost immediate in an example setting where all parties' CDM objects are generated using the same code. In practice, different institutions may implement their code differently and run the risk of having different CDM objects. The blockchain generates consensus that all participants do have the same CDM  object, regardless of their own implementation
 
-For example, in the Allocation use case, each party may have a CDM object like the following one
+For example, in the Allocation use case, each party may have a JSON file with the event's global key, the Algorand transaction ID and block explorer link correpsonding to that event, and the event itslef (which we have truncated below for expositional purposes.)  
 ```json
 {
     "globalKey": "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE=",
@@ -224,5 +224,12 @@ For example, in the Allocation use case, each party may have a CDM object like t
 ...
 
 ```
+
+Any party to the CDM Event can go to the Algorand Blockchain explorer and view this transaction (https://testnet.algoexplorer.io/tx/DGM76CDTM6KTIEWRIHMCHJGBO5T5VNCIFXHJTXMKYHHL76M5R37A). In the editor view of the note field, they can verify the event's global key and the lineage. 
+
+
+![Figure 2: Transaction Information on the Algorand Block Explorer](https://github.com/algorand/DerivhackExamples/blob/master/blob/algo_explorer.png)
+*Figure 2: Transaction Information on the Algorand Block Explorer*
+
 
 

@@ -180,3 +180,49 @@ mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.AffirmationSte
  -Dexec.args="./Files/UC2_allocation_execution_AT1.json"   -e  -q 
 ```
 
+# Verifying Outputs
+Each party in a CDM object stores their own copy of the object, together with its lineage, global key (if available), and a link to the event in the Algorand Blockchain. The blockchain ensures coherency: all users have the same CDM event, and there are no incoherencies between their representations This is almost immediate in an example setting where all parties' CDM objects are generated using the same code. In practice, different institutions may implement their code differently and run the risk of having different CDM objects. The blockchain generates consensus that all participants do have the same CDM  object, regardless of their own implementation
+
+For example, in the Allocation use case, each party may have a CDM object like the following one
+```json
+{
+    "globalKey": "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE=",
+    "algorandTransactionID": "DGM76CDTM6KTIEWRIHMCHJGBO5T5VNCIFXHJTXMKYHHL76M5R37A",
+    "algoExplorerLink": "https://testnet.algoexplorer.io/tx/DGM76CDTM6KTIEWRIHMCHJGBO5T5VNCIFXHJTXMKYHHL76M5R37A",
+    "event": {
+        "lineage": {
+            "executionReference": [{"globalReference": "xxdy/Zsa8dH/GeGisnjJhdqR8cGAuJEU2idvHFlCsuo="}],
+            "eventReference": [{"globalReference": "zeOwGVI5iP80wGc+OHIFp/0QNgcIr88yrAa1M4j576Q="}]
+        },
+        "primitive": {"allocation": [{
+            "before": {"execution": {
+                "identifier": [{
+                    "meta": {"globalKey": "568EPdYtUvpI+Qm08z1yOHoaXH8eCwU/7IP/bDoq0MY="},
+                    "issuerReference": {"globalReference": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="},
+                    "assignedIdentifier": [{
+                        "identifier": {"value": "W3S0XZGEM4S82"},
+                        "version": 1
+                    }]
+                }],
+                "executionVenue": {"name": {"value": "Execution Venue"}},
+                "product": {"security": {"bond": {"productIdentifier": {
+                    "identifier": [{"value": "DH0371475458"}],
+                    "source": "CUSIP"
+                }}}},
+                "quantity": {"amount": 800000},
+                "settlementTerms": {
+                    "settlementAmount": {
+                        "amount": 786720,
+                        "currency": {"value": "USD"}
+                    },
+                    "settlementDate": {"adjustableDate": {"unadjustedDate": {
+                        "month": 10,
+                        "year": 2019,
+                        "day": 17
+                    }}}
+                },
+...
+
+```
+
+

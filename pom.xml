@@ -13,9 +13,9 @@
     <url>https://www.algorand.com/</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>12</maven.compiler.release>
-        <maven.compiler.source>12</maven.compiler.source>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <isda.cdm.version>2.4.14</isda.cdm.version>
     </properties>

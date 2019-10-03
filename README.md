@@ -32,17 +32,28 @@ Running the code in this repository requires that you have
 3. Maven
 
 ## Java and Maven Installation
-There are bash scripts (written for OS X) which install Java and Maven and set the correct paths to use them. These scripts are in the `INSTALL` folder and should be run in the following order
+### OS X
+
+These are bash scripts which install Java and Maven and set the correct paths to use them. These scripts are in the `INSTALL` folder and should be run in the following order
 
 1. `install_brew.sh` if the user does not have Hombrew installed (OS X utility to install programs)
 2. `install_java.sh` if the user does not have Java installed. This installs the OpenJDK 
 3. `install_maven.sh` if the user does not have Maven installed
 
+
+## Ubuntu
+These are bash scripts which install Java and Maven and set the correct paths to use them. These scripts are in the `INSTALL` folder and should be run in the following order
+
+1. `install_java_for_ubuntu.sh` if the user does not have Java installed. This installs the OpenJDK 
+2. `install_maven_for_ubuntu.sh` if the user does not have Maven installed
+
+
+
 ## Java library Installation
 
 The main directory contains a pom.xml file which Maven uses to download Java libraries that the code depends on, including the Algorand Java SDK, and the Java implementation of the ISDA CDM.
 
-The code has been tested on a computer running OS X  Version 10.14.5, OpenJDK 13, and Maven version 3.6.1.
+The code has been tested on a computer running OS X  Version 10.14.5, OpenJDK 13, and Maven version 3.6.1. and on an AWS instance ("4.15.0-1044-aws") running Ubuntu 18.04.2 LTS, OpenJDK 11 and Maven version 3.6.0
 
 ##  Compilation
 A `settings.xml` file is provided in the project root directory, use it install dependencies as below: 

@@ -120,64 +120,16 @@ mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
 ```
 
 ### Bonus: Creating the Allocation Event from the Execution Event
-Participants who want to generate their own allocation event from a file of [allocation instructions](https://github.com/algorand/DerivhackExamples/blob/master/Files/input_allocations.json) can look at the class [```AllocationStep.java``` ] (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AllocationStep.java) which has code that uses functions bundled with the ISDA CDM to generate Allocations from Executions and Allocation Instructions. The code shows how to process the allocation instructions, and generate the allocation. 
+Participants who want to generate their own allocation event from a file of [allocation instructions](https://github.com/algorand/DerivhackExamples/blob/master/Files/input_allocations.json) can look at the class ```AllocationStep.java```  (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AllocationStep.java) which has code that uses functions bundled with the ISDA CDM to generate Allocations from Executions and Allocation Instructions. The code shows how to process the allocation instructions, and generate the allocation. 
 
 
 ## Affirmation
-The third use case is the affirmation of the trade, by each party. Participants can look at the functions
+The third use case is the affirmation of the trade, by each party. In contrast with the other cases, the Participants can look at the classes ```AffirmationStep.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AffirmationStep.java) and ```AffirmImpl.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AffirmationImpl.java) for examples on how to derive the Affirmation of a trade from its allocation, and how to commit details of the affirmation to the Blockchain. 
 
-
-# Algorand’s Framework for Processing CDM events
-
-## Processing CDM Events
-
-Financial institutions that use the Algorand blockchain can use any programming language to process CDM events. For example, they can use the Java implementation of the CDM provided by Regnosys to create events, and serialize them to JSON. 
-
-Example 1 shows a snippet of code that creates an Allocation Primitive using the Java implementation of the CDM based on inputs read from a JSON file.
-
-![Example 1: Code snippet using the Java implementation of CDM to create a JSON object with Allocation Details](https://github.com/algorand/isdasample/blob/master/blob/image_0.png)
-*Example 1: Code snippet using the Java implementation of CDM to create a JSON object with Allocation Details*
-
-## Committing Hashed Event to the Algorand Blockchain
-
-
-Once users have serialized a CDM Object to JSON, they can use a hash function (including Regnosys’ provided hash function that generates canonical keys of CDM objects) to obtain a compact digital fingerprint of the CDM object. This digital fingerprint can then be uploaded to the Algorand blockchain using any of Algorand’s SDKs. Example 2 below shows a program that reads a JSON representation of a CDM Allocation Primitive, deserializes it to Java, computes the Rosetta Key of the Allocation Primitive, and commits this key to the blockchain. 
-
-![Example 2:  Java Program that reads a CDM file, computes the Rosetta Key, and commits the hash to the Algorand blockchain](https://github.com/algorand/isdasample/blob/master/blob/image_2.png)
-*Example 2:  Java Program that reads a CDM file, computes the Rosetta Key, and commits the hash to the Algorand blockchain*
-
-The utility of committing only the Rosetta Key to the blockchain is two-fold
-
-1. All participants in the contract can verify in real-time, by referring to the key on the blockchain, that they have the same representation of the CDM object.
-
-2. Because only a hash is committed to the blockchain, no information is revealed to outsiders who do not have the original JSON object. Thus, any details of the financial transaction are known only to the participating institutions. 
-
-The Rosetta Key committed to the chain serves as time-stamped evidence of a CDM event. Algorand has native support for [cryptographic multisignatures](https://en.wikipedia.org/wiki/Multisignature). Using this feature, a CDM event may not be committed to the blockchain unless all relevant parties  provide their cryptographic signature confirming that the event has happened, and all parties have the same JSON representation of the event.
-
-In addition to committing a CDM event’s Rosetta Key to the blockchain, parties can also commit the Rosetta Key of any objects  referenced by that event. In this way, a complete lineage of a CDM event can be recorded on the blockchain. 
-
-## Verifying Consistency of Hashed Events
-
-In case of disputes or discrepancies, parties can read the Rosetta keys from the blockchain to verify that a given CDM JSON object is the one that has been agreed to. Example 3 below shows Java code that verifies the Rosetta Key of a CDM object against the committed key of that object on the blockchain.
-
-![Example 3:  Java program that verifies that the Rosetta Key of a CDM object matches the Rosetta Key of that
-object on the blockchain](https://github.com/algorand/isdasample/blob/master/blob/image_3.png)
-*Example 3:  Java program that verifies that the Rosetta Key of a CDM object matches the Rosetta Key of that
-object on the blockchain*
-
-## Putting it All Together
-
-Example 4a shows a script that combines the three steps described above. The first step is processing input trades and creating a CDM event. The second step is committing the Rosetta Key of that CDM event to the Algorand blockchain. The last step is verifying that the Rosetta Key committed to the blockchain corresponds to the given CDM event (this last step is necessary, for example, when there are multiple parties that want to ensure their CDM representations stay consistent across the life cycle of the trade). 
-
-![Example 4a: Sample Maven scripts to process a CDM event, commit its Rosetta Key  to the Algorand blockchain, and verifies the Rosetta Key that has been committed](https://github.com/algorand/isdasample/blob/master/blob/image_4.png)
-*Example 4a: Sample Maven scripts to process a CDM event, commit its Rosetta Key  to the Algorand blockchain, and verifies the Rosetta Key that has been committed*
-
-Example 4b shows the output of running this script, including the CDM JSON file name, the link to the Algorand transaction committing this event, and the Rosetta Keys of the committed file. 
-
-![Example 4b: Output from sample Maven scripts, including Rosetta Key of CDM object and link to transaction on Algorand blockchain](https://github.com/algorand/isdasample/blob/master/blob/image_5.png)
-*Example 4b: Output from sample Maven scripts, including Rosetta Key of CDM object and link to transaction on Algorand blockchain*
-
-Example 4c shows that the transaction, including the Rosetta Key corresponding to the CDM event, can be verified on the Algorand blockchain explorer. 
-![Example 4c: Transaction with details, including hashed Rosetta Key, on the Algorand blockchain explorer](https://github.com/algorand/isdasample/blob/master/blob/image_6.png)
-*Example 4c: Transaction with details, including hashed Rosetta Key, on the Algorand blockchain explorer*
+The affirmation step can be run with the shell command
+```bash
+## Create Affirmations from the Allocation file and Commit Them
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.AffirmationStep"\
+ -Dexec.args="./Files/UC2_allocation_execution_AT1.json"   -e  -q 
+```
 

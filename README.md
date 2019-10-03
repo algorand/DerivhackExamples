@@ -72,6 +72,37 @@ In the Derivhack Hackathon, users  are given a [trade execution file](https://gi
 
 In this example, we use the Algorand blockchain to ensure different parties have consistent versions of the file, while keeping their datastores private.  The information stored in the chain includes the global key of the execution, its lineage, and the file path where the user stored the Execution JSON object in their private data store. 
 
+```java
+ public static void main(String [] args) throws Exception{
+        // This function 
+        // 1. Reads a CDM Event from a JSON file
+        // 2. Creates Algorand accounts for all parties in the event
+        // 3. Commits information about the event to the Algorand blockchain
+        // and to the participant's private datastores
+
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        //Read the input arguments and read them into files
+        String fileName = args[0];
+        String fileContents = ReadAndWrite.readFile(fileName);
+
+         //Read the event file into a CDM object using the Rosetta object mapper
+        Event event = rosettaObjectMapper
+                .readValue(fileContents, Event.class);
+        
+        //Add any new parties to the database, and commit the event to their own private databases
+        List<Party> parties = event.getParty();
+        User user;
+
+        for (Party party: parties){
+             user = User.getOrCreateUser(party);
+             user.commitEvent(event);
+        }
+
+       
+    }
+    
+```
+
 Figure 2 shows the code from the main function in the class ```CommitEvent.java```, which reads a CDM Event, creates Algorand accounts for all parties in the event, and then commits the global key and lineage of the event to the blockchain. 
 
 ![Figure 2: Committing an Execution Event](https://github.com/algorand/DerivhackExamples/blob/master/blob/commit_event.png)

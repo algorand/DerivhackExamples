@@ -21,7 +21,8 @@ public  class CommitAffirmation {
 
     public static void commitAffirmation(Affirmation affirmation) throws Exception{
 
-        //Add any new parties to the database, and commit the event to their own private databases
+        //Record all parties participating 
+        // in the affirmation , and commit the event to their own private databases
         List<Party> parties = affirmation.getParty();
         User user;
 

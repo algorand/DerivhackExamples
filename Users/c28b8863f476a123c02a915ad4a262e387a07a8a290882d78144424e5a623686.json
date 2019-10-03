@@ -1,0 +1,20 @@
+{
+    "algorandID": "W3XILFWOTMXKENFDBNTBCQS2G22ACJYXI2ABPROI42Q5TFE6BA2SCWPEZA",
+    "userHash": "c28b8863f476a123c02a915ad4a262e387a07a8a290882d78144424e5a623686",
+    "globalKey": "5746c270",
+    "algorandPassphrase": "exit rifle beauty what vehicle region topple license cancel toddler century soda hidden table august luggage casual twenty correct depend twice pact current absorb meadow",
+    "name": "Client1",
+    "party": {
+        "meta": {
+            "externalKey": "Client1_ID#1_LBLBMTTQKNFTP",
+            "globalKey": "5746c270"
+        },
+        "name": {"value": "Client1"},
+        "partyId": [{"value": "Client1_ID#1_LBLBMTTQKNFTP"}],
+        "account": {
+            "accountName": {"value": "Client1_ACT#1"},
+            "meta": {"globalKey": "d9392c28"},
+            "accountNumber": {"value": "Client1_ACT#1_BGMNIH56Y4Z5E"}
+        }
+    }
+}

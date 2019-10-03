@@ -126,8 +126,10 @@ public  class AffirmationStep {
 
 
     public static void main(String [] args) throws Exception{
+        //Create an object mapper and a hash function
         ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
         SerialisingHashFunction hashFunction = new SerialisingHashFunction();
+        
         //Read the input arguments and read them into files
         String allocationFile = args[0];
         String allocationCDM = ReadAndWrite.readFile(allocationFile);
@@ -136,11 +138,18 @@ public  class AffirmationStep {
         Event allocationEvent = rosettaObjectMapper
                 .readValue(allocationCDM, Event.class);
 
-        int numTrades = allocationEvent.getPrimitive().getAllocation().get(0).getAfter().getAllocatedTrade().size();
+        //Get the number of allocated trades
+        int numTrades = allocationEvent.
+            getPrimitive()
+            .getAllocation()
+            .get(0)
+            .getAfter()
+            .getAllocatedTrade()
+            .size();
+
+        //Affirm each trade on the blockchain and keep a local copy
         for(int tradeNumber = 0; tradeNumber < numTrades; tradeNumber++){       
             Affirmation affirmation = new AffirmImpl().doEvaluate(allocationEvent,tradeNumber).build();
-            String json = rosettaObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(affirmation);
-            ReadAndWrite.writeFile("./Files/Affirmation_"+String.valueOf(tradeNumber)+".json",json);
             CommitAffirmation.commitAffirmation(affirmation);            
         }
     }

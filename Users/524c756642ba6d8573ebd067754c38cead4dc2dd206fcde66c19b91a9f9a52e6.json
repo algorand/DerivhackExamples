@@ -1,0 +1,20 @@
+{
+    "algorandID": "MCIOJ63P4ML2OENO3N3TMSL6MFW3MBZQBC22ACF6DGNESG5TFJ7WPGRGHY",
+    "userHash": "524c756642ba6d8573ebd067754c38cead4dc2dd206fcde66c19b91a9f9a52e6",
+    "globalKey": "xIBwSYskqfYuo71OylXWHFH1u5lbAcAdAnM4LcNheBg=",
+    "algorandPassphrase": "parrot kind volume taxi moral load sting once dentist vault finger option unusual afford cancel march cradle business write kingdom type joke extend abandon civil",
+    "name": "Client1",
+    "party": {
+        "meta": {
+            "externalKey": "Client1_ID#2_CAOIBGBYU6QPR",
+            "globalKey": "xIBwSYskqfYuo71OylXWHFH1u5lbAcAdAnM4LcNheBg="
+        },
+        "name": {"value": "Client1"},
+        "partyId": [{"value": "Client1_ID#2_CAOIBGBYU6QPR"}],
+        "account": {
+            "accountName": {"value": "Client1_ACT#2"},
+            "meta": {"globalKey": "cHT7pO5Q+p3hO3sxjl+ACvyGkYYWIBaA2PpVaRO/dvs="},
+            "accountNumber": {"value": "Client1_ACT#2_BJKXFTGW4BFPY"}
+        }
+    }
+}

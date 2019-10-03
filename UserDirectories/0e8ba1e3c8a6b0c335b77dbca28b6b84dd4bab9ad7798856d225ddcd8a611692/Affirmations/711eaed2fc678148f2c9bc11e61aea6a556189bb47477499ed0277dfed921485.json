@@ -1,0 +1,45 @@
+{
+    "lineage": {
+        "executionReference": [{"globalReference": "vkFNMnTu1Fnk/p1gktgvz040El1XFnMwxYAVdILDlto="}],
+        "eventReference": [{"globalReference": "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE="}]
+    },
+    "algorandTransactionID": "CPB4OGEYVECHZKKSY65OME3ULGDYMZO3JBQNNAHWQ6V5M7YSMIQQ",
+    "algoExplorerLink": "https://testnet.algoexplorer.io/tx/CPB4OGEYVECHZKKSY65OME3ULGDYMZO3JBQNNAHWQ6V5M7YSMIQQ",
+    "affirmation": {
+        "lineage": {
+            "executionReference": [{"globalReference": "vkFNMnTu1Fnk/p1gktgvz040El1XFnMwxYAVdILDlto="}],
+            "eventReference": [{"globalReference": "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE="}]
+        },
+        "identifier": [{
+            "meta": {"globalKey": "b7cc989c"},
+            "assignedIdentifier": [{
+                "identifier": {"value": "affirmation_0"},
+                "version": 1
+            }]
+        }],
+        "partyRole": [
+            {
+                "role": "CLIENT",
+                "partyReference": {"globalReference": "GkATYHcJ0uWdD0klwf0/RCreumcOlWEKDvfHzLfNZiA="}
+            },
+            {
+                "role": "BUYER",
+                "partyReference": {"globalReference": "GkATYHcJ0uWdD0klwf0/RCreumcOlWEKDvfHzLfNZiA="}
+            }
+        ],
+        "party": [{
+            "meta": {
+                "externalKey": "Client1_ID#0_NH90YY6QYVYHM",
+                "globalKey": "84399821"
+            },
+            "name": {"value": "Client1"},
+            "partyId": [{"value": "Client1_ID#0_NH90YY6QYVYHM"}],
+            "account": {
+                "accountName": {"value": "Client1_ACT#0"},
+                "meta": {"globalKey": "b8e40e1c"},
+                "accountNumber": {"value": "Client1_ACT#0_NQQVRTLFIT4HZ"}
+            }
+        }],
+        "status": "AFFIRMED"
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "algorandID": "XPSTAMM2FUC7THQLICWVO7PPZSMS2U73LSXAK7II7GXB4W3T7JGCPIHCXQ",
+    "userHash": "af6d14605871df8e85ba84d621c2030a773fb4cf665b075fe856f0736f293e1b",
+    "globalKey": "GkATYHcJ0uWdD0klwf0/RCreumcOlWEKDvfHzLfNZiA=",
+    "algorandPassphrase": "run champion super discover ostrich midnight cancel satoshi body danger wolf lawsuit push execute spice raccoon public lens snake spoil topic space scare above typical",
+    "name": "Client1",
+    "party": {
+        "meta": {
+            "externalKey": "Client1_ID#0_NH90YY6QYVYHM",
+            "globalKey": "GkATYHcJ0uWdD0klwf0/RCreumcOlWEKDvfHzLfNZiA="
+        },
+        "name": {"value": "Client1"},
+        "partyId": [{"value": "Client1_ID#0_NH90YY6QYVYHM"}],
+        "account": {
+            "accountName": {"value": "Client1_ACT#0"},
+            "meta": {"globalKey": "BRsIov0pBnhQgjuC37YUVLXz5yno3Xkhu7yCZF+3uxY="},
+            "accountNumber": {"value": "Client1_ACT#0_NQQVRTLFIT4HZ"}
+        }
+    }
+}

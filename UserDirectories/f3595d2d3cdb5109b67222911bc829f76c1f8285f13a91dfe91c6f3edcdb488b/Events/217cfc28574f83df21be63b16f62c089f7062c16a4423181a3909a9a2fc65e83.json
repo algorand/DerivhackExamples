@@ -1,0 +1,173 @@
+{
+    "globalKey": "zeOwGVI5iP80wGc+OHIFp/0QNgcIr88yrAa1M4j576Q=",
+    "algorandTransactionID": "DXZXXRYFYBV2V63UGBZUA2V4QLFLGFQVT6D2YUJPBSFDTXACXNCA",
+    "algoExplorerLink": "https://testnet.algoexplorer.io/tx/DXZXXRYFYBV2V63UGBZUA2V4QLFLGFQVT6D2YUJPBSFDTXACXNCA",
+    "event": {
+        "primitive": {"execution": [{"after": {"execution": {
+            "identifier": [{
+                "meta": {"globalKey": "568EPdYtUvpI+Qm08z1yOHoaXH8eCwU/7IP/bDoq0MY="},
+                "issuerReference": {"globalReference": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="},
+                "assignedIdentifier": [{
+                    "identifier": {"value": "W3S0XZGEM4S82"},
+                    "version": 1
+                }]
+            }],
+            "executionVenue": {"name": {"value": "Execution Venue"}},
+            "product": {"security": {"bond": {"productIdentifier": {
+                "identifier": [{"value": "DH0371475458"}],
+                "source": "CUSIP"
+            }}}},
+            "quantity": {"amount": 800000},
+            "settlementTerms": {
+                "settlementAmount": {
+                    "amount": 786720,
+                    "currency": {"value": "USD"}
+                },
+                "settlementDate": {"adjustableDate": {"unadjustedDate": {
+                    "month": 10,
+                    "year": 2019,
+                    "day": 17
+                }}}
+            },
+            "meta": {"globalKey": "xxdy/Zsa8dH/GeGisnjJhdqR8cGAuJEU2idvHFlCsuo="},
+            "price": {
+                "accruedInterest": 1.37,
+                "netPrice": {
+                    "amount": 98.34,
+                    "currency": {"value": "USD"},
+                    "priceExpression": "ABSOLUTE_TERMS"
+                },
+                "grossPrice": {
+                    "amount": 96.97,
+                    "currency": {"value": "USD"},
+                    "priceExpression": "ABSOLUTE_TERMS"
+                }
+            },
+            "executionType": "ELECTRONIC",
+            "partyRole": [
+                {
+                    "role": "CLIENT",
+                    "partyReference": {"globalReference": "xIBwSYskqfYuo71OylXWHFH1u5lbAcAdAnM4LcNheBg="}
+                },
+                {
+                    "role": "EXECUTING_ENTITY",
+                    "partyReference": {"globalReference": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="}
+                },
+                {
+                    "role": "COUNTERPARTY",
+                    "partyReference": {"globalReference": "NKbmTRySI+MwEy+qqV0+romOrBu0GsWdqogMXGtzSVM="}
+                },
+                {
+                    "role": "BUYER",
+                    "partyReference": {"globalReference": "xIBwSYskqfYuo71OylXWHFH1u5lbAcAdAnM4LcNheBg="}
+                },
+                {
+                    "role": "BUYER",
+                    "partyReference": {"globalReference": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="}
+                },
+                {
+                    "role": "SELLER",
+                    "partyReference": {"globalReference": "NKbmTRySI+MwEy+qqV0+romOrBu0GsWdqogMXGtzSVM="}
+                }
+            ],
+            "tradeDate": {"value": {
+                "month": 10,
+                "year": 2019,
+                "day": 16
+            }}
+        }}}]},
+        "meta": {"globalKey": "zeOwGVI5iP80wGc+OHIFp/0QNgcIr88yrAa1M4j576Q="},
+        "action": "NEW",
+        "eventIdentifier": [{
+            "meta": {"globalKey": "ipPCVVQmxN+bPGTKVwXA1Y/+DChL+EmiDiyC1ZbZ5ss="},
+            "issuerReference": {"globalReference": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="},
+            "assignedIdentifier": [{
+                "identifier": {"value": "NZVJ31U4568YT"},
+                "version": 1
+            }]
+        }],
+        "party": [
+            {
+                "meta": {
+                    "externalKey": "Client1_ID#2_CAOIBGBYU6QPR",
+                    "globalKey": "xIBwSYskqfYuo71OylXWHFH1u5lbAcAdAnM4LcNheBg="
+                },
+                "name": {"value": "Client1"},
+                "partyId": [{"value": "Client1_ID#2_CAOIBGBYU6QPR"}],
+                "account": {
+                    "accountName": {"value": "Client1_ACT#2"},
+                    "meta": {"globalKey": "cHT7pO5Q+p3hO3sxjl+ACvyGkYYWIBaA2PpVaRO/dvs="},
+                    "accountNumber": {"value": "Client1_ACT#2_BJKXFTGW4BFPY"}
+                }
+            },
+            {
+                "meta": {
+                    "externalKey": "Broker1_ID#0_4NGIDYZJ4ZBDX",
+                    "globalKey": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="
+                },
+                "name": {"value": "Broker1"},
+                "partyId": [{"value": "Broker1_ID#0_4NGIDYZJ4ZBDX"}],
+                "account": {
+                    "accountName": {"value": "Broker1_ACT#0"},
+                    "meta": {"globalKey": "xvRB/LCSyPGS736BhYfTkW1AH56H1bzHHXbqZJepZ0w="},
+                    "accountNumber": {"value": "Broker1_ACT#0_WWVA12ZJ21IW2"}
+                }
+            },
+            {
+                "meta": {
+                    "externalKey": "Broker2_ID#0_AN93QUDTMRPAB",
+                    "globalKey": "NKbmTRySI+MwEy+qqV0+romOrBu0GsWdqogMXGtzSVM="
+                },
+                "name": {"value": "Broker2"},
+                "partyId": [{"value": "Broker2_ID#0_AN93QUDTMRPAB"}],
+                "account": {
+                    "accountName": {"value": "Broker2_ACT#0"},
+                    "meta": {"globalKey": "GyBU5vHoyL4BM7ctxcCsNp3VXMlELtkERhGao8KbExY="},
+                    "accountNumber": {"value": "Broker2_ACT#0_TTJE0NQUTRIFB"}
+                }
+            }
+        ],
+        "eventDate": {
+            "month": 10,
+            "year": 2019,
+            "day": 16
+        },
+        "eventEffect": {"effectedExecution": [{"globalReference": "xxdy/Zsa8dH/GeGisnjJhdqR8cGAuJEU2idvHFlCsuo="}]},
+        "timestamp": [{
+            "dateTime": {
+                "offset": {
+                    "totalSeconds": 0,
+                    "rules": {
+                        "fixedOffset": true,
+                        "transitionRules": [],
+                        "transitions": []
+                    },
+                    "id": "Z"
+                },
+                "dayOfYear": 289,
+                "year": 2019,
+                "nano": 471000000,
+                "chronology": {
+                    "calendarType": "iso8601",
+                    "id": "ISO"
+                },
+                "minute": 41,
+                "second": 0,
+                "dayOfWeek": "WEDNESDAY",
+                "month": "OCTOBER",
+                "hour": 20,
+                "zone": {
+                    "rules": {
+                        "fixedOffset": true,
+                        "transitionRules": [],
+                        "transitions": []
+                    },
+                    "id": "UTC"
+                },
+                "dayOfMonth": 16,
+                "monthValue": 10
+            },
+            "qualification": "EVENT_CREATION_DATE_TIME"
+        }]
+    }
+}

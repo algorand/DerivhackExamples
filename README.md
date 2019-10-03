@@ -120,7 +120,52 @@ mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
 ```
 
 ### Bonus: Creating the Allocation Event from the Execution Event
-Participants who want to generate their own allocation event from a file of [allocation instructions](https://github.com/algorand/DerivhackExamples/blob/master/Files/input_allocations.json) can look at the class ```AllocationStep.java```  (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AllocationStep.java) which has code that uses functions bundled with the ISDA CDM to generate Allocations from Executions and Allocation Instructions. The code shows how to process the allocation instructions, and generate the allocation. 
+Participants who want to generate their own allocation event from a file of [allocation instructions](https://github.com/algorand/DerivhackExamples/blob/master/Files/input_allocations.json) can look at the class ```AllocationStep.java```  (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AllocationStep.java) which has code that uses functions bundled with the ISDA CDM to generate Allocations from Executions and Allocation Instructions. The code below shows how to process the allocation instructions, and generate the allocation. It is illustrative for other tasks, because it shows how to use functions bundled with the CDM (in this case ```Allocate``` and ```AllocateImpl``` to generate new CDM objects from existing ones.
+
+```java
+
+    public static void main(String [] args) throws Exception{
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        //Read the input arguments and read them into files
+        String allocationInstructionFile = args[0];
+        String executionsCDMFile = args[1];
+        String allocationInstructionsDH = ReadAndWrite.readFile(allocationInstructionFile);
+        String executionsCDM = ReadAndWrite.readFile(executionsCDMFile);
+
+         //Read the executions CDM into a CDM object using the Rosetta object mapper
+        Event executionEvent = rosettaObjectMapper
+                .readValue(executionsCDM, Event.class);
+        
+       // Get the execution associated with the "Execution Event"
+        Execution execution = executionEvent
+                                .getPrimitive()
+                                .getExecution()
+                                .get(0)
+                                .getAfter()  
+                                .getExecution(); 
+
+        //Call a helper method to build the allocation instructions
+        AllocationInstructions allocationInstructions 
+            = buildAllocationInstructions(allocationInstructionsDH);
+
+        //Use Guice to instantiate the allocation function at runtime
+        Injector injector = Guice.createInjector(new AlgorandRuntimeModule());
+        Allocate allocationFunction = injector.getInstance(Allocate.class);
+
+        // Use the CDM's Allocate function to create an allocation event
+        Event allocationEvent = allocationFunction.evaluate(execution,allocationInstructions);
+
+        // Get all the parties for the event, and have them commit the event
+        // to their own datastores, and to the blockchain
+        List<Party> parties = allocationEvent.getParty();
+        User user;
+        for (Party party: parties){
+             user = User.getOrCreateUser(party);
+             user.commitEvent(allocationEvent);
+        }
+
+    }
+```
 
 
 ## Affirmation

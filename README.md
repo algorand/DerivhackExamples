@@ -72,6 +72,9 @@ In the Derivhack Hackathon, users  are given a [trade execution file](https://gi
 
 In this example, we use the Algorand blockchain to ensure different parties have consistent versions of the file, while keeping their datastores private.  The information stored in the chain includes the global key of the execution, its lineage, and the file path where the user stored the Execution JSON object in their private data store. 
 
+The following function, from the class ```CommitEvent.java``` reads a CDM Event, creates Algorand accounts for all parties in the event, and then commits the global key and lineage of the event to the blockchain. 
+
+
 ```java
  public static void main(String [] args) throws Exception{
         // This function 
@@ -96,27 +99,32 @@ In this example, we use the Algorand blockchain to ensure different parties have
         for (Party party: parties){
              user = User.getOrCreateUser(party);
              user.commitEvent(event);
-        }
-
-       
+        }    
     }
     
 ```
 
-Figure 2 shows the code from the main function in the class ```CommitEvent.java```, which reads a CDM Event, creates Algorand accounts for all parties in the event, and then commits the global key and lineage of the event to the blockchain. 
-
-![Figure 2: Committing an Execution Event](https://github.com/algorand/DerivhackExamples/blob/master/blob/commit_event.png)
-
-The corresponding shell command to execute this function is 
+The corresponding shell command to execute this function with the Block trades file is 
 ```bash
 ##Commit the execution file to the blockchain
 mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
  -Dexec.args="./Files/UC1_block_execute_BT1.json" -e -q
 ```
 
+## Allocation
+The second use case for Derivhack is allocation of trades. That is, the block trade execution given in use case 1 will be allocated among multiple accounts. Participants are also given a JSON CDM file specifying the [allocation] (https://github.com/algorand/DerivhackExamples/blob/master/Files/UC2_allocation_execution_AT1.json). Since allocations are CDM events, the same logic applies as in the Execution use case. To commit the allocation event to the blockchain, participants can use the following shell command
+
+```bash
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
+ -Dexec.args="./Files/UC2_allocation_execution_AT1.json" -e -q
+```
+
+### Bonus: Creating the Allocation Event from the Execution Event
+Participants who want to generate their own allocation event from a file of [allocation instructions](https://github.com/algorand/DerivhackExamples/blob/master/Files/input_allocations.json) can look at the class [```AllocationStep.java``` ] (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AllocationStep.java) which has code that uses functions bundled with the ISDA CDM to generate Allocations from Executions and Allocation Instructions. The code shows how to process the allocation instructions, and generate the allocation. 
 
 
-
+## Affirmation
+The third use case is the affirmation of the trade, by each party. Participants can look at the functions
 
 
 # Algorand’s Framework for Processing CDM events

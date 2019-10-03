@@ -6,6 +6,7 @@ import com.algorand.algosdk.crypto.Address;
 import org.jongo.Jongo;
 import com.mongodb.DB;
 import com.mongodb.BasicDBObject;
+import com.mongodb.MongoCommandException;
 import org.jongo.MongoCollection;
 
 import java.io.*;
@@ -16,16 +17,34 @@ import org.isda.cdm.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.*;
 
 import com.algorand.algosdk.algod.client.model.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
+
+import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
+
 public class User{
-	String globalKey;
-	String algorandID;
-	String algorandPassphrase;
-	String name;
-	Party party;
+	public String globalKey;
+	public String algorandID;
+	public String algorandPassphrase;
+	public String name;
+
+	@JsonDeserialize(using = PartyDeserializer.class)
+	@JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+	public Party party;
 
 
 
@@ -42,6 +61,8 @@ public class User{
 			return foundUser;
 		}
 	}
+
+	public User(){};
 
 	public User(Party party, String globalKey, String algorandID, String algorandPassphrase, String name){
 		this.party = party;
@@ -159,7 +180,14 @@ public class User{
 		  String[] roles = { "readWrite" };
 		  commandArguments.put("roles", roles);
 		  BasicDBObject command = new BasicDBObject(commandArguments);
-		  db.command(command);
+		  try{
+		  	db.command(command);
+		  }
+		  catch(MongoCommandException e){
+		  	System.out.println(command);
+		  	throw(e);
+		  }
+
 		  db.getCollection(username);
 
 	}
@@ -175,5 +203,6 @@ public class User{
 		User user = getOrCreateUser(party,mongoDB);
 	}
 
+	
 
 }

@@ -11,11 +11,11 @@ import org.isda.cdm.*;
 
 
 public class EventTransaction{
-	String algorandTransactionID;
-	String algoExplorerLink;
-	Event event;
-	String globalKey;
-	Lineage lineage;
+	public String algorandTransactionID;
+	public String algoExplorerLink;
+	public Event event;
+	public String globalKey;
+	public Lineage lineage;
 
 	public EventTransaction(Event event,String algorandTransactionID){
 		this.event = event;

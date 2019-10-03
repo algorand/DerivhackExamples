@@ -64,7 +64,7 @@ in the root directory.
 
 # Example Use Cases
 ## Execution
-In the Derivhack Hackathon, users  are given a [trade execution file](https://github.com/algorand/DerivhackExamples/Files/UC1_block_execute_BT1.json) and need to 
+In the Derivhack Hackathon, users  are given a [trade execution file](https://github.com/algorand/DerivhackExamples/blob/master/Files/UC1_block_execute_BT1.json) and need to 
 
 1. Load the JSON file into their system
 2. Create users in their distributed ledger corresponding to the parties in the execution

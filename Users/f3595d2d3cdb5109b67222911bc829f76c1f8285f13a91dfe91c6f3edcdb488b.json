@@ -1,0 +1,20 @@
+{
+    "algorandID": "PHDDRL5WKPTHF3YQOSLYNJJIB4PEMCADUVEVZKNK2WU6EUVCLLZVEZGKMU",
+    "userHash": "f3595d2d3cdb5109b67222911bc829f76c1f8285f13a91dfe91c6f3edcdb488b",
+    "globalKey": "NKbmTRySI+MwEy+qqV0+romOrBu0GsWdqogMXGtzSVM=",
+    "algorandPassphrase": "wait brother sadness also manage about name fever smooth practice rare direct fork stamp benefit hotel raw treat spatial someone solar silent good absorb accuse",
+    "name": "Broker2",
+    "party": {
+        "meta": {
+            "externalKey": "Broker2_ID#0_AN93QUDTMRPAB",
+            "globalKey": "NKbmTRySI+MwEy+qqV0+romOrBu0GsWdqogMXGtzSVM="
+        },
+        "name": {"value": "Broker2"},
+        "partyId": [{"value": "Broker2_ID#0_AN93QUDTMRPAB"}],
+        "account": {
+            "accountName": {"value": "Broker2_ACT#0"},
+            "meta": {"globalKey": "GyBU5vHoyL4BM7ctxcCsNp3VXMlELtkERhGao8KbExY="},
+            "accountNumber": {"value": "Broker2_ACT#0_TTJE0NQUTRIFB"}
+        }
+    }
+}

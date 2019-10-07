@@ -18,6 +18,12 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import org.isda.cdm.*;
+import org.isda.cdm.PartyRoleEnum.*;
+
+import java.util.stream.Collectors;
+import com.google.common.collect.MoreCollectors;
+
+import java.math.BigInteger;
 
 public  class CommitEvent {
 
@@ -38,10 +44,46 @@ public  class CommitEvent {
         User user;
         DB mongoDB = MongoUtils.getDatabase("users");
 
+      
+        //Get the execution
+        Execution execution = event
+                                .getPrimitive()
+                                .getExecution().get(0)
+                                .getAfter()
+                                .getExecution();
+
+
+        // Get the executing party  reference
+        String executingPartyReference = execution.getPartyRole()
+                .stream()
+                .filter(r -> r.getRole() == PartyRoleEnum.EXECUTING_ENTITY)
+                .map(r -> r.getPartyReference().getGlobalReference())
+                .collect(MoreCollectors.onlyElement());
+
+
+
+        // Get the executing party
+        Party executingParty = event.getParty().stream()
+                .filter(p -> executingPartyReference.equals(p.getMeta().getGlobalKey()))
+                .collect(MoreCollectors.onlyElement());
+
+        // Get all other parties
+        List<Party> otherParties =  event.getParty().stream()
+                .filter(p -> !executingPartyReference.equals(p.getMeta().getGlobalKey()))
+                .collect(Collectors.toList());
+
+        // Find or create the executing user
+        User executingUser = User.getOrCreateUser(executingParty, mongoDB);
+
+        //Send all other parties the contents of the event as a set of blockchain transactions
         for (Party party: parties){
              user = User.getOrCreateUser(party,mongoDB);
-             user.commitEvent(event);
+             executingUser.sendEventTransaction(user, event, BigInteger.valueOf(1000));
         }
+        //
+
+
+        
 
        
     }

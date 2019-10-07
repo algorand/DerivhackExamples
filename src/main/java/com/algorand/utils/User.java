@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 
 import com.algorand.algosdk.algod.client.model.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -34,6 +36,7 @@ import java.io.IOException;
 import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.math.BigInteger;
 
 
 public class User{
@@ -104,6 +107,25 @@ public class User{
 		}
 		
 
+	public com.algorand.algosdk.algod.client.model.Transaction
+				 sendEventTransaction(User user, Event event, BigInteger amount) throws Exception{
+		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+		rosettaObjectMapper.setSerializationInclusion(Include.NON_NULL);
+		String lineageString = rosettaObjectMapper
+								.writerWithDefaultPrettyPrinter()
+								.writeValueAsString(event.getLineage());
+
+		String indexNotes = "{type: event, lineage: " + lineageString + "," ;
+		String receiverAddress = user.algorandID;
+		String senderSecret = this.algorandPassphrase;
+		String notes = rosettaObjectMapper
+						.writerWithDefaultPrettyPrinter()
+						.writeValueAsString(event);
+
+		return AlgorandUtils.signStringTransaction(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, 
+                							 senderSecret,  receiverAddress,  notes,  indexNotes);
+
+	}
 
 	public void commitEvent(Event event) throws Exception{
 		String eventKey = event.getMeta().getGlobalKey();

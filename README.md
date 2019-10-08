@@ -13,8 +13,8 @@ The goal of the ISDA Common Domain Model (CDM)  is to allow financial institutio
 
 ## The Algorand Blockchain
 
-The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. The Algorand blockchain can process 1000 transactions per second with a latency of less than 5 secods.
-
+The Algorand blockchain can process 1000 transactions per second with a latency of less than 5 seconds and ensures transaction finality with point-of-sale speed.
+ The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. 
 In addition, Algorand provides extensive [documentation](https://developer.algorand.org/docs/getting-started), and provides SDKs in four languages (Go, Python, Java and Javascript) to interact with the blockchain. 
 
 ![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/DerivhackExamples/blob/master/blob/nodes_map.png)

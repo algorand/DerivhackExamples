@@ -87,19 +87,10 @@ public class User{
 		this.algorandPassphrase = algorandPassphrase;
 		this.name = name;
 
-public class User{
-	public String globalKey;
-	public String algorandID;
-	public String algorandPassphrase;
-	public String name;
-	public Party party;
-	public String userHash;
 	}
 
 
-				// Use a Jackson mapper to read the party object into a JSON object
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+				
 	public  User(Party party,DB mongoDB){
 		try{
 				Jongo jongo = new Jongo(mongoDB);
@@ -112,6 +103,16 @@ public class User{
 				this.globalKey = party.getMeta().getGlobalKey();
 
 				users.save(this);
+			}
+		catch(Exception e){
+			this.algorandID = null;
+			this.algorandPassphrase = null;
+			this.party = null;
+			this.globalKey = null;
+
+
+		}
+	}
 
 	public static User getOrCreateUser(Party party) throws Exception{
 		// Creates a user from a party if that user has not been recorded yet.
@@ -344,8 +345,7 @@ public class User{
 
 	}
 
-	public static void main(String [] args) throws IOException{
-
+	
 	public static void main(String [] args) throws Exception{
 		// Testing code for the User class
 		// Create a user from a JSON object representing a CDM party

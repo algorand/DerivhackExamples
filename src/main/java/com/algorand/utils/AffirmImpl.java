@@ -1,4 +1,4 @@
-package com.algorand.demo;
+package com.algorand.utils;
 
 import com.google.inject.Inject;
 import com.rosetta.model.lib.functions.MapperS;
@@ -40,7 +40,7 @@ public class AffirmImpl{
 				new ReKeyProcessStep(rosettaKeyProcessStep));
 	}
 
-	protected  Affirmation.AffirmationBuilder doEvaluate(Event allocation, int tradeIndex){
+	public  Affirmation.AffirmationBuilder doEvaluate(Event allocation, int tradeIndex){
 		
 		// Initialize the AffirmationBuilder
 		Affirmation.AffirmationBuilder affirmationBuilder = new Affirmation.AffirmationBuilder();

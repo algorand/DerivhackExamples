@@ -1,0 +1,20 @@
+{
+    "algorandID": "ZHEPDK4ORGCS2VYU3BWBL4ZSALYPWCTFGJTJCII2UXQRVZGUGQQHIAXN6A",
+    "userHash": "202df85effbfc61fe0c171d5467a1e3e8c04535e337b51aa1fe5c9d299d2d9b5",
+    "globalKey": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU=",
+    "algorandPassphrase": "sponsor refuse quick warfare salmon enhance strategy dose embark wedding enough hammer update annual sense almost auction clarify wave vacuum tip unable range absorb blossom",
+    "name": "Broker1",
+    "party": {
+        "meta": {
+            "externalKey": "Broker1_ID#0_4NGIDYZJ4ZBDX",
+            "globalKey": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="
+        },
+        "name": {"value": "Broker1"},
+        "partyId": [{"value": "Broker1_ID#0_4NGIDYZJ4ZBDX"}],
+        "account": {
+            "accountName": {"value": "Broker1_ACT#0"},
+            "meta": {"globalKey": "xvRB/LCSyPGS736BhYfTkW1AH56H1bzHHXbqZJepZ0w="},
+            "accountNumber": {"value": "Broker1_ACT#0_WWVA12ZJ21IW2"}
+        }
+    }
+}

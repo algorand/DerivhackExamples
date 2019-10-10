@@ -16,6 +16,8 @@ public class AffirmationTransaction{
 	public Affirmation affirmation;
 	public Lineage lineage;
 
+	public AffirmationTransaction(){}
+
 	public AffirmationTransaction(Affirmation affirmation,String algorandTransactionID){
 		this.affirmation = affirmation;
 		this.algorandTransactionID = algorandTransactionID;

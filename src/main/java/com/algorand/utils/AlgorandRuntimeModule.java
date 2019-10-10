@@ -1,4 +1,4 @@
-package com.algorand.demo;
+package com.algorand.utils;
 
 import org.isda.cdm.CdmRuntimeModule;
 import org.isda.cdm.functions.AllocateImpl;
@@ -10,7 +10,7 @@ import org.isda.cdm.functions.NewAllocationPrimitiveImpl;
 public class AlgorandRuntimeModule extends CdmRuntimeModule {
 	
 	@Override
-	protected void configure() {
+	public void configure() {
 		super.configure();
 		bind(Allocate.class).to(AllocateImpl.class);
 		bind(NewAllocationPrimitive.class).to(NewAllocationPrimitiveImpl.class);

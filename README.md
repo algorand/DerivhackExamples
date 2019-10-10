@@ -39,6 +39,7 @@ These are bash scripts which install Java and Maven and set the correct paths to
 1. `install_brew.sh` if the user does not have Hombrew installed (OS X utility to install programs)
 2. `install_java.sh` if the user does not have Java installed. This installs the OpenJDK 
 3. `install_maven.sh` if the user does not have Maven installed
+4. `install_mongo.sh` if the user does not have MongoDB installed
 
 
 ## Ubuntu
@@ -68,12 +69,52 @@ sh compile.sh
 ```
 from the root directory.
 
+
+
+
+## Ubuntu
+These are bash scripts which install Java and Maven and set the correct paths to use them. These scripts are in the `INSTALL` folder and should be run in the following order
+
+1. `install_java_for_ubuntu.sh` if the user does not have Java installed. This installs the OpenJDK 
+2. `install_maven_for_ubuntu.sh` if the user does not have Maven installed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Running the Code
 To run the example code, type 
 ```bash
 sh run.sh 
 ```
 in the root directory.
+
+### (OPTIONAL): Starting and Stopping MongoDB
+
+The code needs to have a Mongo DB service running to persist some information.
+Right now the ```run.sh``` script starts this service automatically if it is not running.
+However, we have provided scripts  to start and stop this automatically 
+
+To run the mongodb service, run
+```bash
+sh start_mongo.sh
+```
+
+To stop the mongodb service, run
+
+```bash
+sh stop_mongo.sh
+``` 
 
 # Example Use Cases
 ## Execution
@@ -85,42 +126,78 @@ In the Derivhack Hackathon, users  are given a [trade execution file](https://gi
 
 In this example, we use the Algorand blockchain to ensure different parties have consistent versions of the file, while keeping their datastores private.  The information stored in the chain includes the global key of the execution, its lineage, and the file path where the user stored the Execution JSON object in their private data store. 
 
-The following function, from the class ```CommitEvent.java``` reads a CDM Event, creates Algorand accounts for all parties in the event, and then commits the global key and lineage of the event to the blockchain. 
-
+The following function, from the class ```CommitExecution.java``` reads a CDM Event, creates Algorand accounts for all parties in the event. It gets the executing party (Client 1's broker), and has this party send details of the execution to all other parties on the Algorand blockchain.
 
 ```java
- public static void main(String [] args) throws Exception{
-        // This function 
-        // 1. Reads a CDM Event from a JSON file
-        // 2. Creates Algorand accounts for all parties in the event
-        // 3. Commits information about the event to the Algorand blockchain
-        // and to the participant's private datastores
+ public  class CommitExecution {
 
-        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+    public static void main(String [] args) throws Exception{
+        
         //Read the input arguments and read them into files
         String fileName = args[0];
         String fileContents = ReadAndWrite.readFile(fileName);
 
          //Read the event file into a CDM object using the Rosetta object mapper
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
         Event event = rosettaObjectMapper
                 .readValue(fileContents, Event.class);
         
-        //Add any new parties to the database, and commit the event to their own private databases
+        //Create Algorand Accounts for all parties
+        // and persist accounts to filesystem/database
         List<Party> parties = event.getParty();
         User user;
+        DB mongoDB = MongoUtils.getDatabase("users");
+        parties.parallelStream()
+                .map(party -> User.getOrCreateUser(party,mongoDB))
+                .collect(Collectors.toList());
 
-        for (Party party: parties){
-             user = User.getOrCreateUser(party);
-             user.commitEvent(event);
-        }    
+        //Get the execution
+        Execution execution = event
+                                .getPrimitive()
+                                .getExecution().get(0)
+                                .getAfter()
+                                .getExecution();
+
+
+        // Get the executing party  reference
+        String executingPartyReference = execution.getPartyRole()
+                .stream()
+                .filter(r -> r.getRole() == PartyRoleEnum.EXECUTING_ENTITY)
+                .map(r -> r.getPartyReference().getGlobalReference())
+                .collect(MoreCollectors.onlyElement());
+
+        // Get the executing party
+        Party executingParty = event.getParty().stream()
+                .filter(p -> executingPartyReference.equals(p.getMeta().getGlobalKey()))
+                .collect(MoreCollectors.onlyElement());
+
+        // Get all other parties
+        List<Party> otherParties =  event.getParty().stream()
+                .filter(p -> !executingPartyReference.equals(p.getMeta().getGlobalKey()))
+                .collect(Collectors.toList());
+
+        // Find or create the executing user
+        User executingUser = User.getOrCreateUser(executingParty, mongoDB);
+       
+        //Send all other parties the contents of the event as a set of blockchain transactions
+        List<User> users = otherParties.
+                            parallelStream()
+                            .map(p -> User.getOrCreateUser(p,mongoDB))
+                            .collect(Collectors.toList());
+
+        List<Transaction> transactions = users
+                                            .parallelStream()
+                                            .map(u->executingUser.sendEventTransaction(u,event,"execution"))
+                                            .collect(Collectors.toList());
+        
     }
-    
-```
+}
+
 
 The corresponding shell command to execute this function with the Block trades file is 
 ```bash
 ##Commit the execution file to the blockchain
-mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitExecution" \
  -Dexec.args="./Files/UC1_block_execute_BT1.json" -e -q
 ```
 
@@ -128,119 +205,92 @@ mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
 The second use case for Derivhack is allocation of trades. That is, the block trade execution given in use case 1 will be allocated among multiple accounts. Participants are also given a JSON CDM file specifying the [allocation] (https://github.com/algorand/DerivhackExamples/blob/master/Files/UC2_allocation_execution_AT1.json). Since allocations are CDM events, the same logic applies as in the Execution use case. To commit the allocation event to the blockchain, participants can use the following shell command
 
 ```bash
-mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitEvent" \
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitAllocation" \
  -Dexec.args="./Files/UC2_allocation_execution_AT1.json" -e -q
-```
-
-### Bonus: Creating the Allocation Event from the Execution Event
-Participants who want to generate their own allocation event from a file of [allocation instructions](https://github.com/algorand/DerivhackExamples/blob/master/Files/input_allocations.json) can look at the class ```AllocationStep.java```  (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AllocationStep.java) which has code that uses functions bundled with the ISDA CDM to generate Allocations from Executions and Allocation Instructions. The code below shows how to process the allocation instructions, and generate the allocation. It is illustrative for other tasks, because it shows how to use functions bundled with the CDM (in this case ```Allocate``` and ```AllocateImpl``` to generate new CDM objects from existing ones.
-
-```java
-
-    public static void main(String [] args) throws Exception{
-        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
-        //Read the input arguments and read them into files
-        String allocationInstructionFile = args[0];
-        String executionsCDMFile = args[1];
-        String allocationInstructionsDH = ReadAndWrite.readFile(allocationInstructionFile);
-        String executionsCDM = ReadAndWrite.readFile(executionsCDMFile);
-
-         //Read the executions CDM into a CDM object using the Rosetta object mapper
-        Event executionEvent = rosettaObjectMapper
-                .readValue(executionsCDM, Event.class);
-        
-       // Get the execution associated with the "Execution Event"
-        Execution execution = executionEvent
-                                .getPrimitive()
-                                .getExecution()
-                                .get(0)
-                                .getAfter()  
-                                .getExecution(); 
-
-        //Call a helper method to build the allocation instructions
-        AllocationInstructions allocationInstructions 
-            = buildAllocationInstructions(allocationInstructionsDH);
-
-        //Use Guice to instantiate the allocation function at runtime
-        Injector injector = Guice.createInjector(new AlgorandRuntimeModule());
-        Allocate allocationFunction = injector.getInstance(Allocate.class);
-
-        // Use the CDM's Allocate function to create an allocation event
-        Event allocationEvent = allocationFunction.evaluate(execution,allocationInstructions);
-
-        // Get all the parties for the event, and have them commit the event
-        // to their own datastores, and to the blockchain
-        List<Party> parties = allocationEvent.getParty();
-        User user;
-        for (Party party: parties){
-             user = User.getOrCreateUser(party);
-             user.commitEvent(allocationEvent);
-        }
-
-    }
 ```
 
 
 ## Affirmation
-The third use case is the affirmation of the trade, by each party. In contrast with the other cases, the Participants can look at the classes ```AffirmationStep.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AffirmationStep.java) and ```AffirmImpl.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AffirmationImpl.java) for examples on how to derive the Affirmation of a trade from its allocation, and how to commit details of the affirmation to the Blockchain. 
+The third use case is the affirmation of the trade by the clients. In contrast with the other cases, the Participants can look at the classes ```CommitAffirmation.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/CommitAffirmation.java) and ```AffirmImpl.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AffirmationImpl.java) for examples on how to derive the Affirmation of a trade from its allocation.
 
-The affirmation step can be run with the shell command
-```bash
-## Create Affirmations from the Allocation file and Commit Them
-mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.AffirmationStep"\
- -Dexec.args="./Files/UC2_allocation_execution_AT1.json"   -e  -q 
+In the affirmation step, the client produces a CDM affirmation from the Allocation Event,
+and sends the affirmation to the broker over the Algorand Chain.
+
+```java
+
+``` class CommitAffirmation {
+public static void main(String[] args){
+
+        //Load the database to lookup users
+        DB mongoDB = MongoUtils.getDatabase("users");
+
+        //Load a file with client global keys
+        String allocationFile = args[0];
+        String allocationCDM = ReadAndWrite.readFile(allocationFile);
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        Event allocationEvent = null;
+            try{
+                allocationEvent = rosettaObjectMapper
+                                    .readValue(allocationCDM, Event.class);
+            }
+            catch(java.io.IOException e){
+                e.printStackTrace();
+            }
+                
+       
+        List<Trade> allocatedTrades = allocationEvent.getPrimitive().getAllocation().get(0).getAfter().getAllocatedTrade();
+        //Keep track of the trade index
+        int tradeIndex = 0;
+
+        //Collect the affirmation transaction id and broker key in a file
+        String result = "";
+        //For each trade...
+        for(Trade trade: allocatedTrades){
+
+        //Get the broker that we need to send the affirmation to
+        String brokerReference = trade.getExecution().getPartyRole()
+            .stream()
+            .filter(r -> r.getRole() == PartyRoleEnum.EXECUTING_ENTITY)
+            .map(r -> r.getPartyReference().getGlobalReference())
+            .collect(MoreCollectors.onlyElement());
+
+            User broker = User.getUser(brokerReference,mongoDB);
+
+        //Get the client reference for that trade
+        String clientReference = trade.getExecution()
+                                        .getPartyRole()
+                                        .stream()
+                                        .filter(r-> r.getRole()==PartyRoleEnum.CLIENT)
+                                        .map(r->r.getPartyReference().getGlobalReference())
+                                        .collect(MoreCollectors.onlyElement());
+                
+        // Load the client user, with algorand passphrase
+        User user = User.getUser(clientReference,mongoDB);
+        String algorandPassphrase = user.algorandPassphrase;
+
+        // Confirm the user has received the global key of the allocation from the broker
+        String receivedKey = AlgorandUtils.readEventTransaction( algorandPassphrase, allocationEvent.getMeta().getGlobalKey());
+        assert receivedKey == allocationEvent.getMeta().getGlobalKey() : "Have not received allocation event from broker";
+            //Compute the affirmation
+            Affirmation affirmation = new AffirmImpl().doEvaluate(allocationEvent,tradeIndex).build();
+                    
+             //Send the affirmation to the broker
+            Transaction transaction = 
+                        user.sendAffirmationTransaction(broker, affirmation);
+                    
+            result += transaction.getTx() + "," + brokerReference +"\n";
+                    
+                
+            tradeIndex = tradeIndex + 1;
+        }
+        try{
+           ReadAndWrite.writeFile("./Files/AffirmationOutputs.txt", result);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+}
 ```
-
-# Verifying Outputs
-Each party in a CDM object stores their own copy of the object, together with its lineage, global key (if available), and a link to the event in the Algorand Blockchain. The blockchain ensures coherency: all users have the same CDM event, and there are no incoherencies between their representations This is almost immediate in an example setting where all parties' CDM objects are generated using the same code. In practice, different institutions may implement their code differently and run the risk of having different CDM objects. The blockchain generates consensus that all participants do have the same CDM  object, regardless of their own implementation
-
-For example, in the Allocation use case, each party may have a JSON file with the event's global key, the Algorand transaction ID and block explorer link correpsonding to that event, and the event itslef (which we have truncated below for expositional purposes, the full file is available [here](https://github.com/algorand/DerivhackExamples/blob/master/blob/exampleEvent.json).)  
-```json
-{
-    "globalKey": "PuitVBWvjXiUF2+7PaG+pXAASnYeIatGIVPTKfPVwQE=",
-    "algorandTransactionID": "DGM76CDTM6KTIEWRIHMCHJGBO5T5VNCIFXHJTXMKYHHL76M5R37A",
-    "algoExplorerLink": "https://testnet.algoexplorer.io/tx/DGM76CDTM6KTIEWRIHMCHJGBO5T5VNCIFXHJTXMKYHHL76M5R37A",
-    "event": {
-        "lineage": {
-            "executionReference": [{"globalReference": "xxdy/Zsa8dH/GeGisnjJhdqR8cGAuJEU2idvHFlCsuo="}],
-            "eventReference": [{"globalReference": "zeOwGVI5iP80wGc+OHIFp/0QNgcIr88yrAa1M4j576Q="}]
-        },
-        "primitive": {"allocation": [{
-            "before": {"execution": {
-                "identifier": [{
-                    "meta": {"globalKey": "568EPdYtUvpI+Qm08z1yOHoaXH8eCwU/7IP/bDoq0MY="},
-                    "issuerReference": {"globalReference": "3vqQOOnXah+v+Cwkdh/hSyDP7iD6lLGqRDW/500GvjU="},
-                    "assignedIdentifier": [{
-                        "identifier": {"value": "W3S0XZGEM4S82"},
-                        "version": 1
-                    }]
-                }],
-                "executionVenue": {"name": {"value": "Execution Venue"}},
-                "product": {"security": {"bond": {"productIdentifier": {
-                    "identifier": [{"value": "DH0371475458"}],
-                    "source": "CUSIP"
-                }}}},
-                "quantity": {"amount": 800000},
-                "settlementTerms": {
-                    "settlementAmount": {
-                        "amount": 786720,
-                        "currency": {"value": "USD"}
-                    },
-                    "settlementDate": {"adjustableDate": {"unadjustedDate": {
-                        "month": 10,
-                        "year": 2019,
-                        "day": 17
-                    }}}
-                },
-...
-
-```
-
-Any party to the CDM Event can go to the Algorand Blockchain explorer and view this transaction (https://testnet.algoexplorer.io/tx/DGM76CDTM6KTIEWRIHMCHJGBO5T5VNCIFXHJTXMKYHHL76M5R37A). In the editor view of the note field, they can verify the event's global key and the lineage. 
-
-
-![Figure 2: Transaction Information on the Algorand Block Explorer](https://github.com/algorand/DerivhackExamples/blob/master/blob/algo_explorer.png)
-*Figure 2: Transaction Information on the Algorand Block Explorer*
-
-
 

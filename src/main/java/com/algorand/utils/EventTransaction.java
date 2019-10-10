@@ -17,6 +17,8 @@ public class EventTransaction{
 	public String globalKey;
 	public Lineage lineage;
 
+	public EventTransaction(){}
+	
 	public EventTransaction(Event event,String algorandTransactionID){
 		this.event = event;
 		this.algorandTransactionID = algorandTransactionID;

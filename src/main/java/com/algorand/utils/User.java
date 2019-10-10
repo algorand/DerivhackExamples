@@ -3,19 +3,16 @@ package com.algorand.utils;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 
-
-import java.util.Arrays;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import org.jongo.Jongo;
+import com.mongodb.DB;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoCommandException;
+import org.jongo.MongoCollection;
 
 import java.io.*;
 import java.util.*;
-import java.nio.*;
-import java.nio.file.*;
 
-
+import org.isda.cdm.Party;
 import org.isda.cdm.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,16 +20,72 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 
 import com.algorand.algosdk.algod.client.model.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import com.google.common.collect.*;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
 
-/****
-User Class: Creates an Algorand User given a CDM Party, and manages that user's
-             keys and storage
-****/
+import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.math.BigInteger;
+
+
+public class User{
+	public String globalKey;
+	public String algorandID;
+	public String algorandPassphrase;
+	public String name;
+
+	@JsonDeserialize(using = PartyDeserializer.class)
+	@JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+	public Party party;
+
+
+
+	public static User getOrCreateUser(Party party,DB mongoDB){
+		String partyKey = party.getMeta().getGlobalKey();
+		Jongo jongo = new Jongo(mongoDB);
+		MongoCollection users = jongo.getCollection("users");
+
+		User foundUser = users.findOne("{party.meta.globalKey: '" + partyKey + "'}").as(User.class);
+		if (foundUser == null){
+			return new User(party,mongoDB);
+		}
+		else{
+			return foundUser;
+		}
+	}
+
+	public static User getUser(String partyKey,DB mongoDB){
+		Jongo jongo = new Jongo(mongoDB);
+		MongoCollection users = jongo.getCollection("users");
+
+		User foundUser = users.findOne("{party.meta.globalKey: '" + partyKey + "'}").as(User.class);
+		System.out.println("key: " + partyKey);
+		System.out.println(foundUser);
+		return foundUser;
+	}
+
+	public User(){};
+
+	public User(Party party, String globalKey, String algorandID, String algorandPassphrase, String name){
+		this.party = party;
+		this.globalKey = globalKey;
+		this.algorandID = algorandID;
+		this.algorandPassphrase = algorandPassphrase;
+		this.name = name;
 
 public class User{
 	public String globalKey;
@@ -41,28 +94,24 @@ public class User{
 	public String name;
 	public Party party;
 	public String userHash;
+	}
 
-	public User( Party party ) throws Exception{
-	// Creates a user given a party object
 
 				// Use a Jackson mapper to read the party object into a JSON object
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	public  User(Party party,DB mongoDB){
+		try{
+				Jongo jongo = new Jongo(mongoDB);
+				MongoCollection users = jongo.getCollection("users");
 
-				//Create an algorand account for the user
-				ArrayList<String> algorandInfo = createAlgorandAccount();
-				this.algorandID = algorandInfo.get(0);
-				this.algorandPassphrase = algorandInfo.get(1);
-
-				//Record the CDM party object, glogal key and name
+				Account algorandInfo = AlgorandUtils.createAccount();
+				this.algorandID = algorandInfo.getAddress().toString();
+				this.algorandPassphrase = algorandInfo.toMnemonic();
 				this.party = party;
 				this.globalKey = party.getMeta().getGlobalKey();
-				this.name = party.getName().getValue();
 
-				//Create a hexadecimal hash, which can be used to create a user file
-				// and folder storing the CDM events that this user is a party to
-				this.userHash = DigestUtils.sha256Hex(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(party));
-	}
+				users.save(this);
 
 	public static User getOrCreateUser(Party party) throws Exception{
 		// Creates a user from a party if that user has not been recorded yet.
@@ -134,6 +183,59 @@ public class User{
 	
 		
 
+	public com.algorand.algosdk.algod.client.model.Transaction
+			 sendEventTransaction(User user, Event event, String type) {
+
+		com.algorand.algosdk.algod.client.model.Transaction result = null;
+		try{
+
+		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+		rosettaObjectMapper.setSerializationInclusion(Include.NON_NULL);
+		
+
+		String indexNotes = "{\"senderKey\": \" "+ this.globalKey + "\", \"type\": \""+type+"\", \"globalKey\": \"" + event.getMeta().getGlobalKey() + "\"}" ;
+		String receiverAddress = user.algorandID;
+		String senderSecret = this.algorandPassphrase;
+		byte[] notes = indexNotes.getBytes();
+
+		//String notes = rosettaObjectMapper
+		//				.writeValueAsString(event);
+
+
+
+		result = AlgorandUtils.signAndSubmit(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes,  BigInteger.valueOf(1000));
+		}
+		catch(Exception e){
+
+			System.out.println("Caught an exception in sendTransaction");
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public com.algorand.algosdk.algod.client.model.Transaction
+			 sendAffirmationTransaction(User user, Affirmation affirmation) {
+
+		com.algorand.algosdk.algod.client.model.Transaction result = null;
+		try{
+
+		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+		rosettaObjectMapper.setSerializationInclusion(Include.NON_NULL);
+		
+		String receiverAddress = user.algorandID;
+		String senderSecret = this.algorandPassphrase;
+		String notes = rosettaObjectMapper
+						.writeValueAsString(affirmation);
+
+		result = AlgorandUtils.signAndSubmit(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes.getBytes(),BigInteger.valueOf(1000));
+		}
+		catch(Exception e){
+
+			System.out.println("Caught an exception in sendTransaction");
+			e.printStackTrace();
+		}
+		return result;
+	}
 
 	public void commitEvent(Event event) throws Exception{
 		//User specific function to commit a CDM event
@@ -223,6 +325,26 @@ public class User{
 
 	}
 
+	public static void createMongoAccount(DB db, String username, String password){
+		  Map<String, Object> commandArguments = new HashMap<>();
+		  commandArguments.put("createUser", username);
+		  commandArguments.put("pwd", password);
+		  String[] roles = { "readWrite" };
+		  commandArguments.put("roles", roles);
+		  BasicDBObject command = new BasicDBObject(commandArguments);
+		  try{
+		  	db.command(command);
+		  }
+		  catch(MongoCommandException e){
+		  	System.out.println(command);
+		  	throw(e);
+		  }
+
+		  db.getCollection(username);
+
+	}
+
+	public static void main(String [] args) throws IOException{
 
 	public static void main(String [] args) throws Exception{
 		// Testing code for the User class
@@ -235,5 +357,6 @@ public class User{
 		User user = getOrCreateUser(party);
 	}
 
+	
 
 }

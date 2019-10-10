@@ -95,6 +95,8 @@ public  class CommitAffirmation {
         // Confirm the user has received the global key of the allocation from the broker
         String receivedKey = AlgorandUtils.readEventTransaction( algorandPassphrase, allocationEvent.getMeta().getGlobalKey());
         assert receivedKey == allocationEvent.getMeta().getGlobalKey() : "Have not received allocation event from broker";
+           
+
             //Compute the affirmation
             Affirmation affirmation = new AffirmImpl().doEvaluate(allocationEvent,tradeIndex).build();
                     

@@ -65,6 +65,16 @@ public class User{
 		}
 	}
 
+	public static User getUser(String partyKey,DB mongoDB){
+		Jongo jongo = new Jongo(mongoDB);
+		MongoCollection users = jongo.getCollection("users");
+
+		User foundUser = users.findOne("{party.meta.globalKey: '" + partyKey + "'}").as(User.class);
+		System.out.println("key: " + partyKey);
+		System.out.println(foundUser);
+		return foundUser;
+	}
+
 	public User(){};
 
 	public User(Party party, String globalKey, String algorandID, String algorandPassphrase, String name){
@@ -82,16 +92,13 @@ public class User{
 				Jongo jongo = new Jongo(mongoDB);
 				MongoCollection users = jongo.getCollection("users");
 
-				ArrayList<String> algorandInfo = createAlgorandAccount();
-				this.algorandID = algorandInfo.get(0);
-				this.algorandPassphrase = algorandInfo.get(1);
+				Account algorandInfo = AlgorandUtils.createAccount();
+				this.algorandID = algorandInfo.getAddress().toString();
+				this.algorandPassphrase = algorandInfo.toMnemonic();
 				this.party = party;
 				this.globalKey = party.getMeta().getGlobalKey();
-				this.name = party.getName().getValue();
+				this.name = party.getAccount().getAccountName().getValue();
 
-				//TODO: Right now the password is the party's global key
-				//      Set this way to make derivhack prototyping easier
-				createMongoAccount(mongoDB,globalKey,globalKey);
 				users.save(this);
 
 			}
@@ -107,24 +114,60 @@ public class User{
 		}
 		
 
-	public com.algorand.algosdk.algod.client.model.Transaction
-				 sendEventTransaction(User user, Event event, BigInteger amount) throws Exception{
+	public List<com.algorand.algosdk.algod.client.model.Transaction>
+			 sendEventTransaction(User user, Event event, String type, BigInteger amount) {
+
+		List<com.algorand.algosdk.algod.client.model.Transaction> result = null;
+		try{
+
 		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
 		rosettaObjectMapper.setSerializationInclusion(Include.NON_NULL);
-		String lineageString = rosettaObjectMapper
-								.writerWithDefaultPrettyPrinter()
-								.writeValueAsString(event.getLineage());
+		
 
-		String indexNotes = "{type: event, lineage: " + lineageString + "," ;
+		String indexNotes = "{\"senderKey\": \" "+ this.globalKey + "\", \"type\": \""+type+"\", \"globalKey\": \"" + event.getMeta().getGlobalKey() + "\", " ;
 		String receiverAddress = user.algorandID;
 		String senderSecret = this.algorandPassphrase;
 		String notes = rosettaObjectMapper
 						.writerWithDefaultPrettyPrinter()
 						.writeValueAsString(event);
 
-		return AlgorandUtils.signStringTransaction(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, 
-                							 senderSecret,  receiverAddress,  notes,  indexNotes);
 
+		result = AlgorandUtils.signStringTransaction(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes,  indexNotes);
+		}
+		catch(Exception e){
+
+			System.out.println("Caught an exception in sendTransaction");
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public List<com.algorand.algosdk.algod.client.model.Transaction>
+			 sendAffirmationTransaction(User user, Affirmation affirmation, String type, BigInteger amount) {
+
+		List<com.algorand.algosdk.algod.client.model.Transaction> result = null;
+		try{
+
+		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+		rosettaObjectMapper.setSerializationInclusion(Include.NON_NULL);
+		
+
+		String indexNotes = "{\"senderKey\": \""+ this.globalKey + "\", \"type\": \""+type+"\"," ;
+		String receiverAddress = user.algorandID;
+		String senderSecret = this.algorandPassphrase;
+		String notes = rosettaObjectMapper
+						.writerWithDefaultPrettyPrinter()
+						.writeValueAsString(affirmation);
+
+
+		result = AlgorandUtils.signStringTransaction(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes,  indexNotes);
+		}
+		catch(Exception e){
+
+			System.out.println("Caught an exception in sendTransaction");
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	public void commitEvent(Event event) throws Exception{

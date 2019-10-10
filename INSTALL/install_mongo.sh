@@ -1,1 +1,2 @@
-brew install mongodb/brew/mongodb-community-shell
+brew tap mongodb/brew
+brew install mongodb-community

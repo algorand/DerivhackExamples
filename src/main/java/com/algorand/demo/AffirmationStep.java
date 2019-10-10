@@ -126,7 +126,7 @@ public  class AffirmationStep {
 
 
     public static void main(String [] args) throws Exception{
-        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        /*ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
         SerialisingHashFunction hashFunction = new SerialisingHashFunction();
         //Read the input arguments and read them into files
         String allocationFile = args[0];
@@ -143,6 +143,7 @@ public  class AffirmationStep {
             ReadAndWrite.writeFile("./Files/Affirmation_"+String.valueOf(tradeNumber)+".json",json);
             CommitAffirmation.commitAffirmation(affirmation);            
         }
+        */
     }
 }
 

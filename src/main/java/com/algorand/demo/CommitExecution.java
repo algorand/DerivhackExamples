@@ -25,26 +25,28 @@ import com.google.common.collect.MoreCollectors;
 
 import java.math.BigInteger;
 
-public  class CommitEvent {
-
- 
+public  class CommitExecution {
 
     public static void main(String [] args) throws Exception{
-        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        
         //Read the input arguments and read them into files
         String fileName = args[0];
         String fileContents = ReadAndWrite.readFile(fileName);
 
          //Read the event file into a CDM object using the Rosetta object mapper
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
         Event event = rosettaObjectMapper
                 .readValue(fileContents, Event.class);
         
-        //Add any new parties to the database, and commit the event to their own private databases
+        //Create Algorand Accounts for all parties
+        // and persist accounts to filesystem/database
         List<Party> parties = event.getParty();
         User user;
         DB mongoDB = MongoUtils.getDatabase("users");
+        parties.parallelStream()
+                .map(party -> User.getOrCreateUser(party,mongoDB))
+                .collect(Collectors.toList());
 
-      
         //Get the execution
         Execution execution = event
                                 .getPrimitive()
@@ -60,8 +62,6 @@ public  class CommitEvent {
                 .map(r -> r.getPartyReference().getGlobalReference())
                 .collect(MoreCollectors.onlyElement());
 
-
-
         // Get the executing party
         Party executingParty = event.getParty().stream()
                 .filter(p -> executingPartyReference.equals(p.getMeta().getGlobalKey()))
@@ -74,20 +74,24 @@ public  class CommitEvent {
 
         // Find or create the executing user
         User executingUser = User.getOrCreateUser(executingParty, mongoDB);
-
+       
         //Send all other parties the contents of the event as a set of blockchain transactions
-        for (Party party: parties){
-             user = User.getOrCreateUser(party,mongoDB);
-             executingUser.sendEventTransaction(user, event, BigInteger.valueOf(1000));
-        }
-        //
+        List<User> users = otherParties.
+                            parallelStream()
+                            .map(p -> User.getOrCreateUser(p,mongoDB))
+                            .collect(Collectors.toList());
 
+        List<List<Transaction>> transactions = users
+                                            .parallelStream()
+                                            .map(u->executingUser.sendEventTransaction(u,event,"execution",BigInteger.valueOf(1000)))
+                                            .collect(Collectors.toList());
+        
+    }
+}
 
         
 
-       
-    }
-}
+
 
 
      

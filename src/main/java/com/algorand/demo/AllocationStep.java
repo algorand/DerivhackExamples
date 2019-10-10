@@ -208,7 +208,7 @@ public  class AllocationStep {
         AllocationInstructions allocationInstructions = buildAllocationInstructions(allocationInstructionsDH);
         Injector injector = Guice.createInjector(new AlgorandRuntimeModule());
         Allocate allocationFunction = injector.getInstance(Allocate.class);
-        Event allocationEvent = allocationFunction.evaluate(execution,allocationInstructions);
+        Event allocationEvent = allocationFunction.evaluate(execution,allocationInstructions,executionEvent);
         List<Party> parties = allocationEvent.getParty();
         
         User user;

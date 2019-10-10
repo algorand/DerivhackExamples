@@ -91,7 +91,6 @@ These are bash scripts which install Java and Maven and set the correct paths to
 
 
 
-
 ## Running the Code
 To run the example code, type 
 ```bash

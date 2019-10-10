@@ -41,28 +41,18 @@ import com.regnosys.rosetta.common.serialisation.RosettaObjectMapper;
 
 public  class CommitAffirmation {
 
-    public static void commitAffirmation(String userKey,String executionKey, String allocationKey){
 
-        
-        
-        
-
-    }
 
     public static void main(String[] args){
+
+        //Load the database to lookup users
         DB mongoDB = MongoUtils.getDatabase("users");
 
-        String fileName = args[0];
-        String fileContents = ReadAndWrite.readFile(fileName);
-        String[] clients = fileContents.split("\n");
-       
-        for(String client: clients){
-            User user = User.getUser(client,mongoDB);
-            String algorandPassphrase = user.algorandPassphrase;
-            String allocationCDM = AlgorandUtils.readStringTransaction(algorandPassphrase,"allocation");
-
-            ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
-            Event allocationEvent = null;
+        //Load a file with client global keys
+        String allocationFile = args[0];
+        String allocationCDM = ReadAndWrite.readFile(allocationFile);
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        Event allocationEvent = null;
             try{
                 allocationEvent = rosettaObjectMapper
                                     .readValue(allocationCDM, Event.class);
@@ -71,40 +61,64 @@ public  class CommitAffirmation {
                 e.printStackTrace();
             }
                 
-            List<Trade> allocatedTrades = allocationEvent.getPrimitive().getAllocation().get(0).getAfter().getAllocatedTrade();
-            int tradeIndex = 0;
-            for(Trade trade: allocatedTrades){
+       
+        List<Trade> allocatedTrades = allocationEvent.getPrimitive().getAllocation().get(0).getAfter().getAllocatedTrade();
+        //Keep track of the trade index
+        int tradeIndex = 0;
 
-                String brokerReference = trade.getExecution().getPartyRole()
-                    .stream()
-                    .filter(r -> r.getRole() == PartyRoleEnum.EXECUTING_ENTITY)
-                    .map(r -> r.getPartyReference().getGlobalReference())
-                    .collect(MoreCollectors.onlyElement());
+        //Collect the affirmation transaction id and broker key in a file
+        String result = "";
+        //For each trade...
+        for(Trade trade: allocatedTrades){
 
-                User broker = User.getUser(brokerReference,mongoDB);
+        //Get the broker that we need to send the affirmation to
+        String brokerReference = trade.getExecution().getPartyRole()
+            .stream()
+            .filter(r -> r.getRole() == PartyRoleEnum.EXECUTING_ENTITY)
+            .map(r -> r.getPartyReference().getGlobalReference())
+            .collect(MoreCollectors.onlyElement());
 
-                String clientReference = trade.getExecution()
-                                            .getPartyRole()
-                                            .stream()
-                                            .filter(r-> r.getRole()==PartyRoleEnum.CLIENT)
-                                            .map(r->r.getPartyReference().getGlobalReference())
-                                            .collect(MoreCollectors.onlyElement());
+            User broker = User.getUser(brokerReference,mongoDB);
+
+        //Get the client reference for that trade
+        String clientReference = trade.getExecution()
+                                        .getPartyRole()
+                                        .stream()
+                                        .filter(r-> r.getRole()==PartyRoleEnum.CLIENT)
+                                        .map(r->r.getPartyReference().getGlobalReference())
+                                        .collect(MoreCollectors.onlyElement());
                 
-                if (clientReference.equals(client)){
-                    Affirmation affirmation = new AffirmImpl().doEvaluate(allocationEvent,tradeIndex).build();
-                    List<Transaction> transactionList = 
-                        user.sendAffirmationTransaction(broker, affirmation,"affirmation",BigInteger.valueOf(1000));
-                    for(Transaction transaction: transactionList){
-                        System.out.println(transaction.getTx());
-                    }
-                }
-                tradeIndex = tradeIndex + 1;
-            
-            }
-        } 
+        // Load the client user, with algorand passphrase
+        User user = User.getUser(clientReference,mongoDB);
+        String algorandPassphrase = user.algorandPassphrase;
 
+        // Confirm the user has received the global key of the allocation from the broker
+        String receivedKey = AlgorandUtils.readEventTransaction( algorandPassphrase, allocationEvent.getMeta().getGlobalKey());
+        assert receivedKey == allocationEvent.getMeta().getGlobalKey() : "Have not received allocation event from broker";
+            //Compute the affirmation
+            Affirmation affirmation = new AffirmImpl().doEvaluate(allocationEvent,tradeIndex).build();
+                    
+             //Send the affirmation to the broker
+            Transaction transaction = 
+                        user.sendAffirmationTransaction(broker, affirmation);
+                    
+            result += transaction.getTx() + "," + brokerReference +"\n";
+                    
+                
+            tradeIndex = tradeIndex + 1;
+        }
+        try{
+           ReadAndWrite.writeFile("./Files/AffirmationOutputs.txt", result);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
+
 }
+
+    
+
 
   
  

@@ -27,6 +27,7 @@ There are bash scripts (written for OS X) which install Java and Maven and set t
 1. `install_brew.sh` if the user does not have Hombrew installed (OS X utility to install programs)
 2. `install_java.sh` if the user does not have Java installed. This installs the OpenJDK 
 3. `install_maven.sh` if the user does not have Maven installed
+4. `install_mongo.sh` if the user does not have MongoDB installed
 
 ### Java library Installation
 
@@ -40,68 +41,250 @@ A `settings.xml` file is provided in the project root directory, use it install 
 mvn -s settings.xml clean install
 
 ```
+
+
+
+
+
 ### Running the Code
 To run the example code and store the output in a file called ```output.txt```, run
 ```bash
 sh run.sh > output.txt
 ```
 
+### (OPTIONAL): Starting and Stopping MongoDB
 
-# Algorand’s Framework for Processing CDM events
+The code needs to have a Mongo DB service running to persist some information.
+Right now the ```run.sh``` script starts this service automatically if it is not running.
+However, we have provided scripts  to start and stop this automatically 
 
-## Processing CDM Events
+To run the mongodb service, run
+```bash
+sh start_mongo.sh
+```
 
-Financial institutions that use the Algorand blockchain can use any programming language to process CDM events. For example, they can use the Java implementation of the CDM provided by Regnosys to create events, and serialize them to JSON. 
+To stop the mongodb service, run
 
-Example 1 shows a snippet of code that creates an Allocation Primitive using the Java implementation of the CDM based on inputs read from a JSON file.
+```bash
+sh stop_mongo.sh
+``` 
 
-![Example 1: Code snippet using the Java implementation of CDM to create a JSON object with Allocation Details](https://github.com/algorand/isdasample/blob/master/blob/image_0.png)
-*Example 1: Code snippet using the Java implementation of CDM to create a JSON object with Allocation Details*
+## Ubuntu
+These are bash scripts which install Java and Maven and set the correct paths to use them. These scripts are in the `INSTALL` folder and should be run in the following order
 
-## Committing Hashed Event to the Algorand Blockchain
+1. `install_java_for_ubuntu.sh` if the user does not have Java installed. This installs the OpenJDK 
+2. `install_maven_for_ubuntu.sh` if the user does not have Maven installed
 
-The Algorand blockchain is a permissionless blockchain with hundreds of independently operating nodes distributed around the world. The Algorand blockchain allows developers to create their applications without having to set up their own distributed systems. Algorand provides extensive [documentation](https://developer.algorand.org/docs/getting-started), and provides SDKs in four languages (Go, Python, Java and Javascript) to interact with the blockchain. 
 
-![Figure 1: Nodes running the Algorand client software around the world](https://github.com/algorand/isdasample/blob/master/blob/image_1.png)
-*Figure 1: Nodes running the Algorand client software around the world*
 
-Once users have serialized a CDM Object to JSON, they can use a hash function (including Regnosys’ provided hash function that generates canonical keys of CDM objects) to obtain a compact digital fingerprint of the CDM object. This digital fingerprint can then be uploaded to the Algorand blockchain using any of Algorand’s SDKs. Example 2 below shows a program that reads a JSON representation of a CDM Allocation Primitive, deserializes it to Java, computes the Rosetta Key of the Allocation Primitive, and commits this key to the blockchain. 
+## Java library Installation
 
-![Example 2:  Java Program that reads a CDM file, computes the Rosetta Key, and commits the hash to the Algorand blockchain](https://github.com/algorand/isdasample/blob/master/blob/image_2.png)
-*Example 2:  Java Program that reads a CDM file, computes the Rosetta Key, and commits the hash to the Algorand blockchain*
+The main directory contains a pom.xml file which Maven uses to download Java libraries that the code depends on, including the Algorand Java SDK, and the Java implementation of the ISDA CDM.
 
-The utility of committing only the Rosetta Key to the blockchain is two-fold
+The code has been tested on a computer running OS X  Version 10.14.5, OpenJDK 13, and Maven version 3.6.1. and on an AWS instance ("4.15.0-1044-aws") running Ubuntu 18.04.2 LTS, OpenJDK 11 and Maven version 3.6.0
 
-1. All participants in the contract can verify in real-time, by referring to the key on the blockchain, that they have the same representation of the CDM object.
+##  Compilation
+A `settings.xml` file is provided in the project root directory, use it install dependencies as below: 
+```bash
+mvn -s settings.xml clean install
 
-2. Because only a hash is committed to the blockchain, no information is revealed to outsiders who do not have the original JSON object. Thus, any details of the financial transaction are known only to the participating institutions. 
+```
 
-The Rosetta Key committed to the chain serves as time-stamped evidence of a CDM event. Algorand has native support for [cryptographic multisignatures](https://en.wikipedia.org/wiki/Multisignature). Using this feature, a CDM event may not be committed to the blockchain unless all relevant parties  provide their cryptographic signature confirming that the event has happened, and all parties have the same JSON representation of the event.
+You can also run 
+```bash
+sh compile.sh
+```
+from the root directory.
 
-In addition to committing a CDM event’s Rosetta Key to the blockchain, parties can also commit the Rosetta Key of any objects  referenced by that event. In this way, a complete lineage of a CDM event can be recorded on the blockchain. 
+## Running the Code
+To run the example code, type 
+```bash
+sh run.sh 
+```
+in the root directory.
 
-## Verifying Consistency of Hashed Events
+# Example Use Cases
+## Execution
+In the Derivhack Hackathon, users  are given a [trade execution file](https://github.com/algorand/DerivhackExamples/blob/master/Files/UC1_block_execute_BT1.json) and need to 
 
-In case of disputes or discrepancies, parties can read the Rosetta keys from the blockchain to verify that a given CDM JSON object is the one that has been agreed to. Example 3 below shows Java code that verifies the Rosetta Key of a CDM object against the committed key of that object on the blockchain.
+1. Load the JSON file into their system
+2. Create users in their distributed ledger corresponding to the parties in the execution
+3. Create a report of the execution
 
-![Example 3:  Java program that verifies that the Rosetta Key of a CDM object matches the Rosetta Key of that
-object on the blockchain](https://github.com/algorand/isdasample/blob/master/blob/image_3.png)
-*Example 3:  Java program that verifies that the Rosetta Key of a CDM object matches the Rosetta Key of that
-object on the blockchain*
+In this example, we use the Algorand blockchain to ensure different parties have consistent versions of the file, while keeping their datastores private.  The information stored in the chain includes the global key of the execution, its lineage, and the file path where the user stored the Execution JSON object in their private data store. 
 
-## Putting it All Together
+The following function, from the class ```CommitExecution.java``` reads a CDM Event, creates Algorand accounts for all parties in the event. It gets the executing party (Client 1's broker), and has this party send details of the execution to all other parties on the Algorand blockchain.
 
-Example 4a shows a script that combines the three steps described above. The first step is processing input trades and creating a CDM event. The second step is committing the Rosetta Key of that CDM event to the Algorand blockchain. The last step is verifying that the Rosetta Key committed to the blockchain corresponds to the given CDM event (this last step is necessary, for example, when there are multiple parties that want to ensure their CDM representations stay consistent across the life cycle of the trade). 
+```java
+ public  class CommitExecution {
 
-![Example 4a: Sample Maven scripts to process a CDM event, commit its Rosetta Key  to the Algorand blockchain, and verifies the Rosetta Key that has been committed](https://github.com/algorand/isdasample/blob/master/blob/image_4.png)
-*Example 4a: Sample Maven scripts to process a CDM event, commit its Rosetta Key  to the Algorand blockchain, and verifies the Rosetta Key that has been committed*
+    public static void main(String [] args) throws Exception{
+        
+        //Read the input arguments and read them into files
+        String fileName = args[0];
+        String fileContents = ReadAndWrite.readFile(fileName);
 
-Example 4b shows the output of running this script, including the CDM JSON file name, the link to the Algorand transaction committing this event, and the Rosetta Keys of the committed file. 
+         //Read the event file into a CDM object using the Rosetta object mapper
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        Event event = rosettaObjectMapper
+                .readValue(fileContents, Event.class);
+        
+        //Create Algorand Accounts for all parties
+        // and persist accounts to filesystem/database
+        List<Party> parties = event.getParty();
+        User user;
+        DB mongoDB = MongoUtils.getDatabase("users");
+        parties.parallelStream()
+                .map(party -> User.getOrCreateUser(party,mongoDB))
+                .collect(Collectors.toList());
 
-![Example 4b: Output from sample Maven scripts, including Rosetta Key of CDM object and link to transaction on Algorand blockchain](https://github.com/algorand/isdasample/blob/master/blob/image_5.png)
-*Example 4b: Output from sample Maven scripts, including Rosetta Key of CDM object and link to transaction on Algorand blockchain*
+        //Get the execution
+        Execution execution = event
+                                .getPrimitive()
+                                .getExecution().get(0)
+                                .getAfter()
+                                .getExecution();
 
-Example 4c shows that the transaction, including the Rosetta Key corresponding to the CDM event, can be verified on the Algorand blockchain explorer. 
-![Example 4c: Transaction with details, including hashed Rosetta Key, on the Algorand blockchain explorer](https://github.com/algorand/isdasample/blob/master/blob/image_6.png)
-*Example 4c: Transaction with details, including hashed Rosetta Key, on the Algorand blockchain explorer*
 
+        // Get the executing party  reference
+        String executingPartyReference = execution.getPartyRole()
+                .stream()
+                .filter(r -> r.getRole() == PartyRoleEnum.EXECUTING_ENTITY)
+                .map(r -> r.getPartyReference().getGlobalReference())
+                .collect(MoreCollectors.onlyElement());
+
+        // Get the executing party
+        Party executingParty = event.getParty().stream()
+                .filter(p -> executingPartyReference.equals(p.getMeta().getGlobalKey()))
+                .collect(MoreCollectors.onlyElement());
+
+        // Get all other parties
+        List<Party> otherParties =  event.getParty().stream()
+                .filter(p -> !executingPartyReference.equals(p.getMeta().getGlobalKey()))
+                .collect(Collectors.toList());
+
+        // Find or create the executing user
+        User executingUser = User.getOrCreateUser(executingParty, mongoDB);
+       
+        //Send all other parties the contents of the event as a set of blockchain transactions
+        List<User> users = otherParties.
+                            parallelStream()
+                            .map(p -> User.getOrCreateUser(p,mongoDB))
+                            .collect(Collectors.toList());
+
+        List<Transaction> transactions = users
+                                            .parallelStream()
+                                            .map(u->executingUser.sendEventTransaction(u,event,"execution"))
+                                            .collect(Collectors.toList());
+        
+    }
+}
+
+```
+
+The corresponding shell command to execute this function with the Block trades file is 
+```bash
+##Commit the execution file to the blockchain
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitExecution" \
+ -Dexec.args="./Files/UC1_block_execute_BT1.json" -e -q
+```
+
+## Allocation
+The second use case for Derivhack is allocation of trades. That is, the block trade execution given in use case 1 will be allocated among multiple accounts. Participants are also given a JSON CDM file specifying the [allocation] (https://github.com/algorand/DerivhackExamples/blob/master/Files/UC2_allocation_execution_AT1.json). Since allocations are CDM events, the same logic applies as in the Execution use case. To commit the allocation event to the blockchain, participants can use the following shell command
+
+```bash
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitAllocation" \
+ -Dexec.args="./Files/UC2_allocation_execution_AT1.json" -e -q
+```
+
+
+## Affirmation
+The third use case is the affirmation of the trade by the clients. In contrast with the other cases, the Participants can look at the classes ```CommitAffirmation.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/CommitAffirmation.java) and ```AffirmImpl.java``` (https://github.com/algorand/DerivhackExamples/blob/master/src/main/java/com/algorand/demo/AffirmationImpl.java) for examples on how to derive the Affirmation of a trade from its allocation.
+
+In the affirmation step, the client produces a CDM affirmation from the Allocation Event,
+and sends the affirmation to the broker over the Algorand Chain.
+
+```java
+
+``` class CommitAffirmation {
+public static void main(String[] args){
+
+        //Load the database to lookup users
+        DB mongoDB = MongoUtils.getDatabase("users");
+
+        //Load a file with client global keys
+        String allocationFile = args[0];
+        String allocationCDM = ReadAndWrite.readFile(allocationFile);
+        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
+        Event allocationEvent = null;
+            try{
+                allocationEvent = rosettaObjectMapper
+                                    .readValue(allocationCDM, Event.class);
+            }
+            catch(java.io.IOException e){
+                e.printStackTrace();
+            }
+                
+       
+        List<Trade> allocatedTrades = allocationEvent.getPrimitive().getAllocation().get(0).getAfter().getAllocatedTrade();
+        //Keep track of the trade index
+        int tradeIndex = 0;
+
+        //Collect the affirmation transaction id and broker key in a file
+        String result = "";
+        //For each trade...
+        for(Trade trade: allocatedTrades){
+
+        //Get the broker that we need to send the affirmation to
+        String brokerReference = trade.getExecution().getPartyRole()
+            .stream()
+            .filter(r -> r.getRole() == PartyRoleEnum.EXECUTING_ENTITY)
+            .map(r -> r.getPartyReference().getGlobalReference())
+            .collect(MoreCollectors.onlyElement());
+
+            User broker = User.getUser(brokerReference,mongoDB);
+
+        //Get the client reference for that trade
+        String clientReference = trade.getExecution()
+                                        .getPartyRole()
+                                        .stream()
+                                        .filter(r-> r.getRole()==PartyRoleEnum.CLIENT)
+                                        .map(r->r.getPartyReference().getGlobalReference())
+                                        .collect(MoreCollectors.onlyElement());
+                
+        // Load the client user, with algorand passphrase
+        User user = User.getUser(clientReference,mongoDB);
+        String algorandPassphrase = user.algorandPassphrase;
+
+        // Confirm the user has received the global key of the allocation from the broker
+        String receivedKey = AlgorandUtils.readEventTransaction( algorandPassphrase, allocationEvent.getMeta().getGlobalKey());
+        assert receivedKey == allocationEvent.getMeta().getGlobalKey() : "Have not received allocation event from broker";
+            //Compute the affirmation
+            Affirmation affirmation = new AffirmImpl().doEvaluate(allocationEvent,tradeIndex).build();
+                    
+             //Send the affirmation to the broker
+            Transaction transaction = 
+                        user.sendAffirmationTransaction(broker, affirmation);
+                    
+            result += transaction.getTx() + "," + brokerReference +"\n";
+                    
+                
+            tradeIndex = tradeIndex + 1;
+        }
+        try{
+           ReadAndWrite.writeFile("./Files/AffirmationOutputs.txt", result);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+
+The affirmation step can be run with the shell command
+```bash
+## Create Affirmations from the Allocation file and Commit Them
+mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitAffirmation"\
+ -Dexec.args="./Files/UC2_allocation_execution_AT1.json"   -e  -q 
+```

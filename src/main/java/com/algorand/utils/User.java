@@ -114,25 +114,27 @@ public class User{
 		}
 		
 
-	public List<com.algorand.algosdk.algod.client.model.Transaction>
-			 sendEventTransaction(User user, Event event, String type, BigInteger amount) {
+	public com.algorand.algosdk.algod.client.model.Transaction
+			 sendEventTransaction(User user, Event event, String type) {
 
-		List<com.algorand.algosdk.algod.client.model.Transaction> result = null;
+		com.algorand.algosdk.algod.client.model.Transaction result = null;
 		try{
 
 		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
 		rosettaObjectMapper.setSerializationInclusion(Include.NON_NULL);
 		
 
-		String indexNotes = "{\"senderKey\": \" "+ this.globalKey + "\", \"type\": \""+type+"\", \"globalKey\": \"" + event.getMeta().getGlobalKey() + "\", " ;
+		String indexNotes = "{\"senderKey\": \" "+ this.globalKey + "\", \"type\": \""+type+"\", \"globalKey\": \"" + event.getMeta().getGlobalKey() + "\"}" ;
 		String receiverAddress = user.algorandID;
 		String senderSecret = this.algorandPassphrase;
-		String notes = rosettaObjectMapper
-						.writerWithDefaultPrettyPrinter()
-						.writeValueAsString(event);
+		byte[] notes = indexNotes.getBytes();
+
+		//String notes = rosettaObjectMapper
+		//				.writeValueAsString(event);
 
 
-		result = AlgorandUtils.signStringTransaction(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes,  indexNotes);
+
+		result = AlgorandUtils.signAndSubmit(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes,  BigInteger.valueOf(1000));
 		}
 		catch(Exception e){
 
@@ -142,25 +144,21 @@ public class User{
 		return result;
 	}
 
-	public List<com.algorand.algosdk.algod.client.model.Transaction>
-			 sendAffirmationTransaction(User user, Affirmation affirmation, String type, BigInteger amount) {
+	public com.algorand.algosdk.algod.client.model.Transaction
+			 sendAffirmationTransaction(User user, Affirmation affirmation) {
 
-		List<com.algorand.algosdk.algod.client.model.Transaction> result = null;
+		com.algorand.algosdk.algod.client.model.Transaction result = null;
 		try{
 
 		ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
 		rosettaObjectMapper.setSerializationInclusion(Include.NON_NULL);
 		
-
-		String indexNotes = "{\"senderKey\": \""+ this.globalKey + "\", \"type\": \""+type+"\"," ;
 		String receiverAddress = user.algorandID;
 		String senderSecret = this.algorandPassphrase;
 		String notes = rosettaObjectMapper
-						.writerWithDefaultPrettyPrinter()
 						.writeValueAsString(affirmation);
 
-
-		result = AlgorandUtils.signStringTransaction(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes,  indexNotes);
+		result = AlgorandUtils.signAndSubmit(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, senderSecret,  receiverAddress,  notes.getBytes(),BigInteger.valueOf(1000));
 		}
 		catch(Exception e){
 

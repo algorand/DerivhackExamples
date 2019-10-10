@@ -17,7 +17,7 @@ public class MongoUtils{
 	Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
 	rootLogger.setLevel(Level.OFF);
 	MongoClientURI uri = new MongoClientURI(
-    	"mongodb://127.0.0.1:27017/");
+    	"mongodb://localhost");
 
 	MongoClient mongoClient = new MongoClient(uri);
 	DB database = mongoClient.getDB(name);

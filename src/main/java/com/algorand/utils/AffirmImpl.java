@@ -1,4 +1,4 @@
-package com.algorand.demo;
+package com.algorand.utils;
 
 import com.google.inject.Inject;
 import com.rosetta.model.lib.functions.MapperS;
@@ -13,7 +13,7 @@ import org.isda.cdm.AllocationPrimitive.AllocationPrimitiveBuilder;
 import org.isda.cdm.metafields.FieldWithMetaString;
 import org.isda.cdm.metafields.ReferenceWithMetaParty;
 import org.isda.cdm.processor.EventEffectProcessStep;
-import static org.isda.cdm.ConfirmationStatusEnum.CONFIRMED;
+import static org.isda.cdm.AffirmationStatusEnum.AFFIRMED;
 import static org.isda.cdm.PartyRoleEnum.CLIENT;
 import org.isda.cdm.metafields.ReferenceWithMetaEvent.ReferenceWithMetaEventBuilder;
 import org.isda.cdm.metafields.ReferenceWithMetaExecution.ReferenceWithMetaExecutionBuilder;
@@ -29,21 +29,21 @@ import com.google.common.collect.MoreCollectors;
 /**
  * Sample Allocate implementation, should be used as a simple example only.
  */
-public class ConfirmImpl{
+public class AffirmImpl{
 
 	private final List<PostProcessStep> postProcessors;
 
-	public ConfirmImpl() {
+	public AffirmImpl() {
 		RosettaKeyProcessStep rosettaKeyProcessStep = new RosettaKeyProcessStep(NonNullHashCollector::new);
 		this.postProcessors = Arrays.asList(rosettaKeyProcessStep,
 				new RosettaKeyValueProcessStep(RosettaKeyValueHashFunction::new),
 				new ReKeyProcessStep(rosettaKeyProcessStep));
 	}
 
-	protected  Confirmation.ConfirmationBuilder doEvaluate(Event allocation, int tradeIndex){
+	public  Affirmation.AffirmationBuilder doEvaluate(Event allocation, int tradeIndex){
 		
 		// Initialize the AffirmationBuilder
-		Confirmation.ConfirmationBuilder confirmationBuilder = new Confirmation.ConfirmationBuilder();
+		Affirmation.AffirmationBuilder affirmationBuilder = new Affirmation.AffirmationBuilder();
 	
 		// Get the execution for the given trade index
 		Execution execution = allocation
@@ -84,18 +84,18 @@ public class ConfirmImpl{
 							.build())
 						 .build();
 
-		//Build the confirmation
-		confirmationBuilder
-			.addIdentifier(getIdentifier("confirmation_"+ String.valueOf(tradeIndex), 1))
+		//Build the affirmation
+		affirmationBuilder
+			.addIdentifier(getIdentifier("affirmation_"+ String.valueOf(tradeIndex), 1))
 			.addParty(clientParties)
 			.addPartyRole(partyRoles)
 			.setLineage(lineage)
-			.setStatus(CONFIRMED);
+			.setStatus(AFFIRMED);
 
 		// Update keys / references
-		postProcessors.forEach(postProcessStep -> postProcessStep.runProcessStep(Confirmation.class, confirmationBuilder));
+		postProcessors.forEach(postProcessStep -> postProcessStep.runProcessStep(Affirmation.class, affirmationBuilder));
 
-		return confirmationBuilder;
+		return affirmationBuilder;
 	}
 
 

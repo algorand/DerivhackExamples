@@ -81,9 +81,9 @@ public  class CommitExecution {
                             .map(p -> User.getOrCreateUser(p,mongoDB))
                             .collect(Collectors.toList());
 
-        List<List<Transaction>> transactions = users
+        List<Transaction> transactions = users
                                             .parallelStream()
-                                            .map(u->executingUser.sendEventTransaction(u,event,"execution",BigInteger.valueOf(1000)))
+                                            .map(u->executingUser.sendEventTransaction(u,event,"execution"))
                                             .collect(Collectors.toList());
         
     }

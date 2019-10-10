@@ -185,9 +185,9 @@ public class AlgorandUtils
                     System.out.println(signedTx.transactionID);
                     System.out.println("Round: " + b3.getRound());
                     System.out.println("Waiting for confirmation... (pool error, if any:)" + b3.getPoolerror());
-                    Thread.sleep(500);
+                    //Thread.sleep(500);
                 }
-            } catch (ApiException | InterruptedException e) {
+            } catch (ApiException e) {
                 
                 System.err.println("Exception when calling algod#pendingTxInformation: " + e.getMessage());
                 break;
@@ -284,7 +284,7 @@ public class AlgorandUtils
         try {
             NodeStatus status = algodApiInstance.getStatus();
             BigInteger lastRound = status.getLastRound();
-            BigInteger maxtx = BigInteger.valueOf(30);
+            BigInteger maxtx = BigInteger.valueOf(200);
             BigInteger firstRound = lastRound.subtract(BigInteger.valueOf(1000)); // 1000
             Account recoveredAccount = new Account(secret);
             //Get the transactions for the address in the last 1k rounds
@@ -300,6 +300,38 @@ public class AlgorandUtils
         return tList.getTransactions();
 
  
+    }
+
+    public static String readEventTransaction(String algorandPassphrase,String globalKey){
+        List<com.algorand.algosdk.algod.client.model.Transaction> transactions = null;
+        try{
+        transactions = 
+            AlgorandUtils.getTransactions(Globals.ALGOD_API_ADDR, Globals.ALGOD_API_TOKEN, algorandPassphrase);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        String notes = null;
+        String result = null;
+        for(com.algorand.algosdk.algod.client.model.Transaction transaction: transactions){
+            try{
+                notes = new String(transaction.getNoteb64());
+                EventIndexTransaction indexTransaction = mapper.readValue(notes,EventIndexTransaction.class);
+                if( indexTransaction.globalKey.equals(globalKey)){
+                    result = notes;
+                }
+            }
+            catch(java.io.IOException e){
+                continue;               
+            }
+        }
+
+        
+        return notes;
+        
+
     }
 
     public static String readStringTransaction(String algorandPassphrase,String type){

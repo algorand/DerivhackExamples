@@ -97,10 +97,10 @@ public  class CommitAllocation {
                     .collect(Collectors.toList());
             
             //Send all other parties the contents of the event as a set of blockchain transactions
-            List<List<Transaction>> transactions =   otherUsers
+            List<Transaction> transactions =   otherUsers
                                                 .parallelStream()
                                                 .map( u->  executingUser
-                                                .sendEventTransaction(u,event,"allocation",BigInteger.valueOf(1000)))
+                                                .sendEventTransaction(u,event,"allocation"))
                                               .collect(Collectors.toList());
             
             clients += clientReference + "\n";

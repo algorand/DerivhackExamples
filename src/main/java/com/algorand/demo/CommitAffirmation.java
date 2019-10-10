@@ -117,34 +117,7 @@ public  class CommitAffirmation {
         }
     }
 
-    public static void main(String [] args) throws Exception{
-        ObjectMapper rosettaObjectMapper = RosettaObjectMapper.getDefaultRosettaObjectMapper();
-        //Read the input arguments and read them into files
-        String fileName = args[0];
-        String fileContents = ReadAndWrite.readFile(fileName);
-
-        //Read the event file into a CDM object using the Rosetta object mapper
-        Affirmation affirmation = rosettaObjectMapper
-                .readValue(fileContents, Affirmation.class);
- 
-        //Get the client party
-
-        String clientReference = affirmation.getPartyRole()
-                .stream()
-                .filter(r -> r.getRole() == PartyRoleEnum.CLIENT)
-                .map(r -> r.getPartyReference().getGlobalReference())
-                .collect(MoreCollectors.onlyElement());
-
-
-
-        // Get the executing party
-        Party client = affirmation.getParty().stream()
-                .filter(p -> clientReference.equals(p.getMeta().getGlobalKey()))
-                .collect(MoreCollectors.onlyElement());
-
-        
-   
-    }
+    
 }
 
      

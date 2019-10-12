@@ -1,7 +1,11 @@
 ##Example Java scripts to use Algorand with the ISDA CDM
 
 ##Start mongoDB
-bash start_mongo.sh
+## Only works on OS X as written
+sh start_mongo.sh
+
+##UNCOMMENT THIS LINE FOR UBUNBTU
+# bash start_mongo_on_ubuntu.sh
 
 ##Commit the execution file to the blockchain
 mvn -s settings.xml exec:java -Dexec.mainClass="com.algorand.demo.CommitExecution" \

@@ -47,7 +47,7 @@ These are bash scripts which install Java and Maven and set the correct paths to
 
 1. `install_java_for_ubuntu.sh` if the user does not have Java installed. This installs the OpenJDK 
 2. `install_maven_for_ubuntu.sh` if the user does not have Maven installed
-
+3. `install_mongo_for_ubuntu.sh` if the user does not have MongoDB installed
 
 
 ## Java library Installation
@@ -72,31 +72,20 @@ from the root directory.
 
 
 
-## Ubuntu
-These are bash scripts which install Java and Maven and set the correct paths to use them. These scripts are in the `INSTALL` folder and should be run in the following order
-
-1. `install_java_for_ubuntu.sh` if the user does not have Java installed. This installs the OpenJDK 
-2. `install_maven_for_ubuntu.sh` if the user does not have Maven installed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Running the Code
 To run the example code, type 
 ```bash
 sh run.sh 
 ```
 in the root directory.
+
+This script will start a MongoDB service and run the examples for the first three use cases in the hackathon. Ubuntu users need to uncomment the following line to run the mongo service on ubuntu.
+```bash
+##UNCOMMENT THIS LINE FOR UBUNBTU                                                                                                 
+# bash start_mongo_on_ubuntu.sh 
+```
+
+
 
 ### (OPTIONAL): Starting and Stopping MongoDB
 
@@ -191,7 +180,7 @@ The following function, from the class ```CommitExecution.java``` reads a CDM Ev
         
     }
 }
-
+```
 
 The corresponding shell command to execute this function with the Block trades file is 
 ```bash

@@ -2,7 +2,7 @@
 
 ##Start mongoDB
 ## Only works on OS X as written
-sh start_mongo.sh
+#sh start_mongo.sh
 
 ##UNCOMMENT THIS LINE FOR UBUNBTU
 # bash start_mongo_on_ubuntu.sh

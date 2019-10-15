@@ -1,6 +1,6 @@
 # Introduction
 
-The goal of the ISDA Common Domain Model (CDM)  is to allow financial institutions to have a coherent representation of financial instruments and events. This document shows how institutions can use the CDM and the Algorand blockchain to maintain separately owned but financial databases with the following properties:
+The goal of the ISDA Common Domain Model (CDM)  is to allow financial institutions to have a coherent representation of financial instruments and events. This document shows how institutions can use the CDM and the Algorand blockchain to maintain separately owned but coherent financial databases with the following properties:
 
 1. **Coherency**: All institutions participating in a trade agree on the digital representation of that trade at any point in time.
 
